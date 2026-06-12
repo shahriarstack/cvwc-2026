@@ -44,7 +44,7 @@ function parseCSV(text: string): Record<string, string>[] {
     
     for (let j = 0; j < line.length; j++) {
       const char = line[j];
-      if (char === '"' || char === "'") {
+      if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === delimiter && !inQuotes) {
         values.push(current.trim().replace(/^["']|["']$/g, ''));
