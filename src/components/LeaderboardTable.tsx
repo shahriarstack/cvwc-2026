@@ -82,7 +82,6 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
             <tr style={{ textAlign: 'left' }}>
               <th style={{ width: '35px' }}>RK</th>
               <th>TERRITORY</th>
-              <th className="text-center" title="Match Logs Uploaded (Till-Date)" style={{ width: '45px' }}>MAT</th>
               <th className="text-center" title="New Sales Score (Foton + Mahindra) - Max 20 PTS" style={{ width: '75px', color: 'var(--fifa-burgundy-light)' }}>SALES (20)</th>
               <th className="text-center" title="Resale Units Score - Max 30 PTS" style={{ width: '75px', color: 'var(--fifa-burgundy-light)' }}>RESALE (30)</th>
               <th className="text-center" title="Bonus: Mahindra (+2/Mhd) & Extra Resale (+2/Unit > 6) - Max 10 PTS" style={{ width: '75px', color: 'var(--fifa-gold-dark)' }}>BONUS (10)</th>
@@ -93,7 +92,7 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
           <tbody>
             {teams.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-4 text-secondary">
+                <td colSpan={7} className="text-center py-4 text-secondary">
                   No data uploaded yet for this division.
                 </td>
               </tr>
@@ -123,23 +122,22 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     
                     {/* Territory Flag & Name */}
                     <td data-label="Territory" style={{ fontWeight: 600 }}>
-                      <div className="flex items-center" style={{ gap: '0.75rem' }}>
+                      <div className="territory-cell-wrapper" style={{ gap: '0.75rem' }}>
                         <CountryFlag countryName={team.name} />
-                        <span className="team-name">{team.name}</span>
-                        {division === "Elite" && index === 0 && (
-                          <span style={{ fontSize: '1.1rem', cursor: 'help' }} title="Tournament Leader">🏆</span>
-                        )}
-                        {division !== "Elite" && index === 0 && (
-                          <span style={{ fontSize: '0.9rem', color: '#10b981', cursor: 'help' }} title="Promotion Zone">▲</span>
-                        )}
-                        {division !== "Challengers" && index >= teams.length - 2 && teams.length > 3 && (
-                          <span style={{ fontSize: '0.9rem', color: '#ef4444', cursor: 'help' }} title="Relegation Zone">▼</span>
-                        )}
+                        <div className="flex items-center" style={{ gap: '0.25rem' }}>
+                          <span className="team-name">{team.name}</span>
+                          {division === "Elite" && index === 0 && (
+                            <span style={{ fontSize: '1.1rem', cursor: 'help' }} title="Tournament Leader">🏆</span>
+                          )}
+                          {division !== "Elite" && index === 0 && (
+                            <span style={{ fontSize: '0.9rem', color: '#10b981', cursor: 'help' }} title="Promotion Zone">▲</span>
+                          )}
+                          {division !== "Challengers" && index >= teams.length - 2 && teams.length > 3 && (
+                            <span style={{ fontSize: '0.9rem', color: '#ef4444', cursor: 'help' }} title="Relegation Zone">▼</span>
+                          )}
+                        </div>
                       </div>
                     </td>
-
-                    {/* Matches Played */}
-                    <td data-label="Matches" className="text-center text-secondary" style={{ verticalAlign: 'middle' }}>{team.played}</td>
                     
                     {/* New Sales Score (max 20) */}
                     <td data-label="Sales" className="text-center" style={{ verticalAlign: 'middle' }}>
@@ -224,7 +222,6 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
       {/* Visual Table Legend */}
       <div className="flex justify-between items-center mt-4" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', borderTop: '1px solid rgba(0, 0, 0, 0.06)', paddingTop: '0.75rem' }}>
         <div className="flex" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
-          <span><strong>MAT:</strong> Logs Uploaded (Till-Date)</span>
           <span><strong>SALES:</strong> Foton + Mahindra (Max 20)</span>
           <span><strong>RESALE:</strong> Resale Units (Max 30)</span>
           <span><strong>BONUS:</strong> Mahindra (+2/Mhd) + Resale (+2/Unit &gt; 6) - Max 10</span>

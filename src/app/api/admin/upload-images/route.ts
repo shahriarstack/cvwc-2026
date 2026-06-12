@@ -93,6 +93,18 @@ export async function POST(req: NextRequest) {
       goalkeeper2Image: ''
     };
 
+    // Explicitly delete/clear the previous image from the database if a new one is being uploaded
+    if (strikerImageBase64 !== undefined && config.strikerImage) {
+      await sql`UPDATE "SpotlightConfig" SET "strikerImage" = NULL WHERE id = 'default'`;
+    }
+    if (goalkeeperImageBase64 !== undefined && config.goalkeeperImage) {
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeperImage" = NULL WHERE id = 'default'`;
+    }
+    if (goalkeeper2ImageBase64 !== undefined && config.goalkeeper2Image) {
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeper2Image" = NULL WHERE id = 'default'`;
+    }
+
+
     const finalStrikerName = strikerName !== null ? strikerName.trim() : config.strikerName;
     const finalGoalkeeperName = goalkeeperName !== null ? goalkeeperName.trim() : config.goalkeeperName;
     const finalGoalkeeper2Name = goalkeeper2Name !== null ? goalkeeper2Name.trim() : config.goalkeeper2Name;
