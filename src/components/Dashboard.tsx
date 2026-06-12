@@ -33,6 +33,8 @@ interface DashboardProps {
     goalkeeperName?: string;
     strikerImageBase64?: string;
     goalkeeperImageBase64?: string;
+    goalkeeper2Name?: string;
+    goalkeeper2ImageBase64?: string;
   };
 }
 
@@ -123,17 +125,29 @@ export default function Dashboard({ initialTerritories, spotlightOverrides }: Da
 
   const topTeamMembers = useMemo(() => {
     if (!topTeam) return [];
-    const members = getTerritoryTeam(topTeam.name);
+    
+    // Copy the original array to avoid mutating static data
+    const members = [...getTerritoryTeam(topTeam.name)];
+    
+    // If the admin provided a second goalkeeper, inject them dynamically into the array
+    if (spotlightOverrides?.goalkeeper2Name || spotlightOverrides?.goalkeeper2ImageBase64) {
+      members.push({
+        name: spotlightOverrides.goalkeeper2Name || "Recovery Officer",
+        role: "Recovery Goalkeeper",
+        avatarCode: "recovery"
+      });
+    }
     
     // Scale rating between 85 and 99 based on team's totalScore (max 100)
     const rating = 85 + (topTeam.totalScore / 100) * 14;
+
+    // Track if we've processed the first goalkeeper so the second one gets the 2nd image
+    let goalkeepersProcessed = 0;
 
     return members.map((m) => {
       let memberStats: any = {};
       let imageSrc = "";
       let playerName = m.name;
-      
-      const timeBuster = mounted ? Date.now() : "";
 
       if (m.avatarCode === "sales") {
         memberStats = {
@@ -151,11 +165,25 @@ export default function Dashboard({ initialTerritories, spotlightOverrides }: Da
         memberStats = {
           recovery: topTeam.avgRecoveryPercentage,
         };
-        if (spotlightOverrides?.goalkeeperImageBase64) {
-          imageSrc = spotlightOverrides.goalkeeperImageBase64;
-        }
-        if (spotlightOverrides?.goalkeeperName) {
-          playerName = spotlightOverrides.goalkeeperName;
+        
+        goalkeepersProcessed++;
+        
+        if (goalkeepersProcessed === 1) {
+          // First Goalkeeper
+          if (spotlightOverrides?.goalkeeperImageBase64) {
+            imageSrc = spotlightOverrides.goalkeeperImageBase64;
+          }
+          if (spotlightOverrides?.goalkeeperName) {
+            playerName = spotlightOverrides.goalkeeperName;
+          }
+        } else {
+          // Second Goalkeeper (Dynamically Injected)
+          if (spotlightOverrides?.goalkeeper2ImageBase64) {
+            imageSrc = spotlightOverrides.goalkeeper2ImageBase64;
+          }
+          if (spotlightOverrides?.goalkeeper2Name) {
+            playerName = spotlightOverrides.goalkeeper2Name;
+          }
         }
       } else {
         memberStats = {
@@ -172,7 +200,7 @@ export default function Dashboard({ initialTerritories, spotlightOverrides }: Da
         imageSrc,
       };
     });
-  }, [topTeam, mounted, spotlightOverrides]);
+  }, [topTeam, spotlightOverrides]);
 
   // Divisions configuration for navigation
   const tabsConfig = [

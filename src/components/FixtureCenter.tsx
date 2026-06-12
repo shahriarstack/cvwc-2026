@@ -281,6 +281,8 @@ export default function FixtureCenter({ initialTerritories }: FixtureCenterProps
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
+              gap: "0.4rem",
               fontSize: "0.7rem",
               color: "var(--text-secondary)"
             }}>

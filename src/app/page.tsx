@@ -20,7 +20,7 @@ export const runtime = 'edge';
 
 export default async function Home() {
   let rawTerritories: any[] = [];
-  let spotlightOverrides = { strikerName: '', goalkeeperName: '', strikerImageBase64: '', goalkeeperImageBase64: '' };
+  let spotlightOverrides = { strikerName: '', goalkeeperName: '', strikerImageBase64: '', goalkeeperImageBase64: '', goalkeeper2Name: '', goalkeeper2ImageBase64: '' };
   let dbError: string | null = null;
   let dbErrorDetails: string | null = null;
 
@@ -52,6 +52,8 @@ export default async function Home() {
         spotlightOverrides.goalkeeperName = config.goalkeeperName || '';
         spotlightOverrides.strikerImageBase64 = config.strikerImage || '';
         spotlightOverrides.goalkeeperImageBase64 = config.goalkeeperImage || '';
+        spotlightOverrides.goalkeeper2Name = config.goalkeeper2Name || '';
+        spotlightOverrides.goalkeeper2ImageBase64 = config.goalkeeper2Image || '';
       }
     } catch (e) {
       console.error('Error fetching spotlight config from database:', e);

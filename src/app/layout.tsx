@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   description: "ACI Motors Commercial Vehicle Business performance standings leaderboard",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 function LiveNewsTicker() {
   const tickerItems = [
     "🏆 ACI MOTORS COMMERCIAL VEHICLE WORLD CUP 2026 IS ACTIVE!",
@@ -26,7 +34,7 @@ function LiveNewsTicker() {
   ];
 
   return (
-    <div className="ticker-wrap">
+    <div className="ticker-wrap hidden md:flex">
       <div className="ticker-live-tag">LIVE TICKER</div>
       <div className="ticker">
         {tickerItems.map((item, idx) => (
@@ -47,89 +55,120 @@ function LiveNewsTicker() {
 
 function Navbar() {
   return (
-    <nav style={{ 
-      background: 'rgba(255, 255, 255, 0.85)', 
-      borderBottom: '1px solid rgba(223, 183, 44, 0.25)',
-      boxShadow: '0 4px 20px rgba(124, 18, 36, 0.04)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      position: 'relative',
-      zIndex: 90
-    }}>
-      <div className="container flex items-center justify-between py-2">
-        {/* Sleek logo badge integration */}
-        <Link href="/" className="flex items-center" style={{ gap: '0.5rem' }}>
+    <>
+      {/* Top Navbar - Used for branding on mobile, and full nav on desktop */}
+      <nav className="top-navbar" style={{ 
+        background: 'rgba(255, 255, 255, 0.85)', 
+        borderBottom: '1px solid rgba(223, 183, 44, 0.25)',
+        boxShadow: '0 4px 20px rgba(124, 18, 36, 0.04)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 90
+      }}>
+        <div className="container flex items-center justify-center md:justify-between py-2 md:py-3">
+          {/* Sleek logo badge integration */}
+          <Link href="/" className="flex items-center" style={{ gap: '0.5rem' }}>
+            <div style={{
+              background: 'var(--fifa-burgundy)',
+              padding: '0.3rem 0.75rem',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(223, 183, 44, 0.3)',
+              boxShadow: '0 2px 8px rgba(124, 18, 36, 0.1)'
+            }}>
+              <img 
+                src="https://i.ibb.co.com/N2kYDkbt/ACI-Motors-Logo-AI-White.png" 
+                alt="ACI Motors" 
+                style={{ height: '18px', objectFit: 'contain' }}
+              />
+            </div>
+            <span style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 900, 
+              color: 'var(--fifa-burgundy)', 
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              CVWC 2026
+            </span>
+          </Link>
+
+          {/* Desktop Nav Links (Hidden on mobile) */}
+          <div className="hidden md:flex items-center" style={{ gap: '1.25rem' }}>
+            <Link href="/" className="font-bold tab-btn nav-link">
+              📋 Standings
+            </Link>
+            <Link href="/matches" className="font-bold tab-btn nav-link">
+              ⚔️ Fixtures
+            </Link>
+            <Link href="/admin" className="font-bold tab-btn nav-link">
+              ⚙️ Admin
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* App-like Bottom Navigation Bar (Visible only on mobile) */}
+      <div className="mobile-bottom-nav md:hidden" style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '65px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(15px)',
+        WebkitBackdropFilter: 'blur(15px)',
+        borderTop: '1px solid rgba(0,0,0,0.08)',
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        zIndex: 100,
+        paddingBottom: 'env(safe-area-inset-bottom)' // Safe area for iOS
+      }}>
+        <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem' }}>
+          <span style={{ fontSize: '1.25rem' }}>📋</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}>Standings</span>
+        </Link>
+        
+        <Link href="/matches" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem', position: 'relative' }}>
           <div style={{
-            background: 'var(--fifa-burgundy)',
-            padding: '0.3rem 0.75rem',
-            borderRadius: '6px',
+            position: 'absolute',
+            top: '-20px',
+            background: 'linear-gradient(135deg, var(--fifa-burgundy-light) 0%, var(--fifa-burgundy) 100%)',
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            border: '1px solid rgba(223, 183, 44, 0.3)',
-            boxShadow: '0 2px 8px rgba(124, 18, 36, 0.1)'
+            boxShadow: '0 4px 15px rgba(124, 18, 36, 0.4)',
+            border: '2px solid #fff'
           }}>
-            <img 
-              src="https://i.ibb.co.com/N2kYDkbt/ACI-Motors-Logo-AI-White.png" 
-              alt="ACI Motors" 
-              style={{ height: '18px', objectFit: 'contain' }}
-            />
+            <span style={{ fontSize: '1.3rem' }}>⚔️</span>
           </div>
-          <span style={{ 
-            fontSize: '1.15rem', 
-            fontWeight: 800, 
-            color: 'var(--fifa-burgundy)', 
-            letterSpacing: '0.5px' 
-          }}>
-            CVWC 2026
-          </span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '22px' }}>Fixtures</span>
         </Link>
-        <div className="flex items-center" style={{ gap: '1.25rem' }}>
-          <Link href="/" className="font-bold tab-btn" style={{ 
-            padding: '0.35rem 0.75rem', 
-            borderRadius: '6px', 
-            fontSize: '0.85rem',
-            border: '1px solid transparent',
-            color: 'var(--text-primary)',
-            background: 'transparent',
-            boxShadow: 'none'
-          }}>
-            📋 Standing Tables
-          </Link>
-          <Link href="/matches" className="font-bold tab-btn" style={{ 
-            padding: '0.35rem 0.75rem', 
-            borderRadius: '6px', 
-            fontSize: '0.85rem',
-            border: '1px solid transparent',
-            color: 'var(--text-primary)',
-            background: 'transparent',
-            boxShadow: 'none'
-          }}>
-            ⚔️ Fixtures & Matches
-          </Link>
-          <Link href="/admin" className="font-bold tab-btn" style={{ 
-            padding: '0.35rem 0.75rem', 
-            borderRadius: '6px', 
-            fontSize: '0.85rem',
-            border: '1px solid transparent',
-            color: 'var(--text-secondary)',
-            background: 'transparent',
-            boxShadow: 'none'
-          }}>
-            ⚙️ Admin Panel
-          </Link>
-        </div>
+        
+        <Link href="/admin" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem' }}>
+          <span style={{ fontSize: '1.25rem' }}>⚙️</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}>Admin</span>
+        </Link>
       </div>
-    </nav>
+    </>
   );
 }
 
 function Footer() {
   return (
-    <footer style={{
+    <footer className="pb-24 md:pb-6" style={{
       background: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.95) 100%)',
       borderTop: '1px solid rgba(124, 18, 36, 0.08)',
-      padding: '1.25rem 0',
+      paddingTop: '1.25rem',
       marginTop: '1.5rem',
       color: 'var(--text-secondary)',
       fontSize: '0.8rem',

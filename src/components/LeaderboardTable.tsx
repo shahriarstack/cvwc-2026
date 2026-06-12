@@ -115,14 +115,14 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     className={getRowClass(index)}
                   >
                     {/* Rank Column */}
-                    <td>
+                    <td data-label="Rank">
                       <span className="rank-number">
                         {index + 1}
                       </span>
                     </td>
                     
                     {/* Territory Flag & Name */}
-                    <td style={{ fontWeight: 600 }}>
+                    <td data-label="Territory" style={{ fontWeight: 600 }}>
                       <div className="flex items-center" style={{ gap: '0.75rem' }}>
                         <CountryFlag countryName={team.name} />
                         <span className="team-name">{team.name}</span>
@@ -139,10 +139,10 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     </td>
 
                     {/* Matches Played */}
-                    <td className="text-center text-secondary" style={{ verticalAlign: 'middle' }}>{team.played}</td>
+                    <td data-label="Matches" className="text-center text-secondary" style={{ verticalAlign: 'middle' }}>{team.played}</td>
                     
                     {/* New Sales Score (max 20) */}
-                    <td className="text-center" style={{ verticalAlign: 'middle' }}>
+                    <td data-label="Sales" className="text-center" style={{ verticalAlign: 'middle' }}>
                       <div className="flex flex-col items-center justify-center">
                         <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{team.newSalesScore.toFixed(1)} <span style={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.7 }}>PTS</span></span>
                         <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
@@ -152,7 +152,7 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     </td>
                     
                     {/* Resales Score (max 30) */}
-                    <td className="text-center" style={{ verticalAlign: 'middle' }}>
+                    <td data-label="Resale" className="text-center" style={{ verticalAlign: 'middle' }}>
                       <div className="flex flex-col items-center justify-center">
                         <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{team.resaleScore.toFixed(1)} <span style={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.7 }}>PTS</span></span>
                         <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{team.resaleUnits} units</span>
@@ -160,7 +160,7 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     </td>
                     
                     {/* Bonus Score (max 10) */}
-                    <td className="text-center" style={{ verticalAlign: 'middle' }}>
+                    <td data-label="Bonus" className="text-center" style={{ verticalAlign: 'middle' }}>
                       <div className="flex flex-col items-center justify-center">
                         <span style={{ 
                           fontWeight: 700, 
@@ -181,7 +181,7 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     </td>
                     
                     {/* Recovery Score (max 40) */}
-                    <td className="text-center" style={{ verticalAlign: 'middle' }}>
+                    <td data-label="Recovery" className="text-center" style={{ verticalAlign: 'middle' }}>
                       <div className="flex flex-col items-center justify-center">
                         <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--fifa-pitch-green)' }}>{team.recoveryScore.toFixed(1)} <span style={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.7 }}>PTS</span></span>
                         <span style={{ fontSize: '0.65rem', color: 'var(--fifa-pitch-green)', fontWeight: 600 }}>{team.avgRecoveryPercentage.toFixed(1)}%</span>
@@ -189,7 +189,7 @@ export default function LeaderboardTable({ division, teams, color }: Leaderboard
                     </td>
                     
                     {/* Total Points (max 100) */}
-                    <td className="text-center" style={{ verticalAlign: 'middle' }}>
+                    <td data-label="Total" className="text-center" style={{ verticalAlign: 'middle' }}>
                       <div className="flex flex-col items-center justify-center">
                         {/* Main Highlight: Total PTS */}
                         <span style={{ 

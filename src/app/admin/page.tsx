@@ -46,10 +46,12 @@ export default function AdminDashboard() {
   // Spotlight Image & Name Upload State
   const [strikerImage, setStrikerImage] = useState<File | null>(null);
   const [goalkeeperImage, setGoalkeeperImage] = useState<File | null>(null);
+  const [goalkeeper2Image, setGoalkeeper2Image] = useState<File | null>(null);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
   const [imageUploadMessage, setImageUploadMessage] = useState('');
   const [strikerNameInput, setStrikerNameInput] = useState('');
   const [goalkeeperNameInput, setGoalkeeperNameInput] = useState('');
+  const [goalkeeper2NameInput, setGoalkeeper2NameInput] = useState('');
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -73,6 +75,7 @@ export default function AdminDashboard() {
           const data = await res.json();
           setStrikerNameInput(data.strikerName || '');
           setGoalkeeperNameInput(data.goalkeeperName || '');
+          setGoalkeeper2NameInput(data.goalkeeper2Name || '');
         }
       } catch (e) {}
     };
@@ -133,7 +136,7 @@ export default function AdminDashboard() {
 
   const handleImageUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!strikerImage && !goalkeeperImage && !strikerNameInput.trim() && !goalkeeperNameInput.trim()) {
+    if (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim()) {
       setImageUploadMessage('Error: Please enter names or select image files.');
       return;
     }
@@ -144,8 +147,10 @@ export default function AdminDashboard() {
     const formData = new FormData();
     if (strikerImage) formData.append('striker', strikerImage);
     if (goalkeeperImage) formData.append('goalkeeper', goalkeeperImage);
+    if (goalkeeper2Image) formData.append('goalkeeper2', goalkeeper2Image);
     formData.append('strikerName', strikerNameInput);
     formData.append('goalkeeperName', goalkeeperNameInput);
+    formData.append('goalkeeper2Name', goalkeeper2NameInput);
 
     try {
       const res = await fetch('/api/admin/upload-images', {
@@ -157,10 +162,13 @@ export default function AdminDashboard() {
         setImageUploadMessage('Success! Spotlight player data updated.');
         setStrikerImage(null);
         setGoalkeeperImage(null);
+        setGoalkeeper2Image(null);
         const strikerInput = document.getElementById('striker-file-input') as HTMLInputElement;
         const gkInput = document.getElementById('gk-file-input') as HTMLInputElement;
+        const gk2Input = document.getElementById('gk2-file-input') as HTMLInputElement;
         if (strikerInput) strikerInput.value = '';
         if (gkInput) gkInput.value = '';
+        if (gk2Input) gk2Input.value = '';
       } else {
         setImageUploadMessage(`Error: ${data.error}`);
       }
@@ -706,18 +714,75 @@ export default function AdminDashboard() {
                   />
                 </div>
               </div>
+
+              <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
+                <div>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', display: 'block', marginBottom: '0.5rem' }}>2nd Recovery Goalkeeper Name (Optional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Enter name"
+                    value={goalkeeper2NameInput}
+                    onChange={(e) => setGoalkeeper2NameInput(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#0a0d18',
+                      color: 'white',
+                      fontFamily: 'inherit',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>2nd Goalkeeper Photo</label>
+                  <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
+                    <label 
+                      htmlFor="gk2-file-input" 
+                      className="btn"
+                      style={{ 
+                        textTransform: 'uppercase', 
+                        letterSpacing: '0.5px',
+                        fontSize: '0.75rem',
+                        padding: '0.5rem 1rem',
+                        display: 'inline-block',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        background: 'linear-gradient(135deg, var(--fifa-burgundy-light) 0%, var(--fifa-burgundy) 100%)',
+                        border: '1px solid rgba(223, 183, 44, 0.3)',
+                        boxShadow: '0 4px 15px rgba(124, 18, 36, 0.3)',
+                        borderRadius: '6px',
+                        fontWeight: 800,
+                      }}
+                    >
+                      Choose Image
+                    </label>
+                    <span className="text-secondary" style={{ fontSize: '0.75rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }} title={goalkeeper2Image ? goalkeeper2Image.name : ""}>
+                      {goalkeeper2Image ? goalkeeper2Image.name : "No file chosen"}
+                    </span>
+                  </div>
+                  <input 
+                    id="gk2-file-input"
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => setGoalkeeper2Image(e.target.files?.[0] || null)}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+              </div>
               
               <button 
                 type="submit" 
                 className="btn" 
-                disabled={imageUploadLoading || (!strikerImage && !goalkeeperImage && !strikerNameInput.trim() && !goalkeeperNameInput.trim())} 
+                disabled={imageUploadLoading || (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim())} 
                 style={{ 
                   width: '100%',
                   marginTop: '0.5rem',
-                  opacity: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !strikerNameInput.trim() && !goalkeeperNameInput.trim())) ? 0.5 : 1,
-                  cursor: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !strikerNameInput.trim() && !goalkeeperNameInput.trim())) ? 'not-allowed' : 'pointer',
-                  background: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !strikerNameInput.trim() && !goalkeeperNameInput.trim())) ? '#475569' : undefined,
-                  boxShadow: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !strikerNameInput.trim() && !goalkeeperNameInput.trim())) ? 'none' : undefined,
+                  opacity: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim())) ? 0.5 : 1,
+                  cursor: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim())) ? 'not-allowed' : 'pointer',
+                  background: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim())) ? '#475569' : undefined,
+                  boxShadow: (imageUploadLoading || (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim())) ? 'none' : undefined,
                 }}
               >
                 {imageUploadLoading ? 'Saving Player Data...' : '⚡ Save Spotlight Customization'}
