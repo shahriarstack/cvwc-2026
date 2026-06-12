@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/edge';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
@@ -15,15 +15,8 @@ function getPrisma() {
       throw new Error('DATABASE_URL environment variable is missing. Please set it in your Cloudflare Pages dashboard under Settings -> Environment variables.');
     }
 
-    // Only use the 'ws' library if native WebSocket is not available
-    if (typeof (globalThis as any).WebSocket === 'undefined') {
-      try {
-        const ws = require('ws');
-        neonConfig.webSocketConstructor = ws;
-      } catch (e) {
-        console.error('Failed to load "ws" package:', e);
-      }
-    }
+    // Cloudflare natively supports WebSocket, so we do not need to import or configure 'ws'.
+    // We completely avoid require('ws') because it crashes the Next.js Edge compiler.
     
     const pool = new Pool({ connectionString: databaseUrl });
     const adapter = new PrismaNeon(pool as any);
