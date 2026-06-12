@@ -15,7 +15,23 @@ function parseCSV(text: string): Record<string, string>[] {
   }
   if (headerIndex >= lines.length) return [];
   
-  const headers = lines[headerIndex].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+  const headerLine = lines[headerIndex];
+  // Detect delimiter (tab, semicolon, or comma)
+  const delimiter = headerLine.includes('\t') ? '\t' : (headerLine.includes(';') ? ';' : ',');
+  
+  const rawHeaders = headerLine.split(delimiter).map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+  
+  // Fuzzy match headers to expected keys
+  const headerMap = rawHeaders.map(h => {
+    const norm = h.replace(/[^a-z0-9]/g, '');
+    if (norm.includes('territory') || norm === 'name') return 'territoryName';
+    if (norm.includes('foton')) return 'newSalesFoton';
+    if (norm.includes('mahindra')) return 'newSalesMahindra';
+    if (norm.includes('resale')) return 'resale';
+    if (norm.includes('recovery')) return 'recoveryPercentage';
+    return h;
+  });
+
   const results: Record<string, string>[] = [];
   
   for (let i = headerIndex + 1; i < lines.length; i++) {
@@ -30,7 +46,7 @@ function parseCSV(text: string): Record<string, string>[] {
       const char = line[j];
       if (char === '"' || char === "'") {
         inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === delimiter && !inQuotes) {
         values.push(current.trim().replace(/^["']|["']$/g, ''));
         current = '';
       } else {
@@ -40,12 +56,21 @@ function parseCSV(text: string): Record<string, string>[] {
     values.push(current.trim().replace(/^["']|["']$/g, ''));
     
     const record: Record<string, string> = {};
-    headers.forEach((header, index) => {
-      record[header] = values[index] || '';
+    headerMap.forEach((mappedHeader, index) => {
+      record[mappedHeader] = values[index] || '';
     });
+    // Also include raw headers for fallback
+    rawHeaders.forEach((raw, index) => {
+        if (!record[raw]) record[raw] = values[index] || '';
+    });
+    
     results.push(record);
   }
   return results;
+}
+
+function normalizeName(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
 export async function POST(req: NextRequest) {
@@ -62,23 +87,29 @@ export async function POST(req: NextRequest) {
     date.setHours(0,0,0,0);
     const text = await file.text();
     
-    // Expected CSV Headers: territoryName, newSalesFoton, newSalesMahindra, resale, recoveryPercentage
     const records = parseCSV(text);
 
     const territories = await prisma.territory.findMany();
-    const territoryMap = new Map(territories.map(t => [t.name.toLowerCase(), t.id]));
+    const territoryMap = new Map(territories.map(t => [normalizeName(t.name), t.id]));
 
     let processed = 0;
 
     for (const record of records) {
-      const tName = record.territoryName?.trim().toLowerCase();
-      if (!tName || !territoryMap.has(tName)) continue;
+      const rawTName = record.territoryName?.trim() || record.name?.trim();
+      if (!rawTName) continue;
+      
+      const tName = normalizeName(rawTName);
+      if (!territoryMap.has(tName)) continue;
 
       const territoryId = territoryMap.get(tName)!;
       const newSalesFoton = parseInt(record.newSalesFoton) || 0;
       const newSalesMahindra = parseInt(record.newSalesMahindra) || 0;
       const resale = parseInt(record.resale) || 0;
-      const recoveryPercentage = parseFloat(record.recoveryPercentage) || 0;
+      
+      // Handle percentages like "45%" or "45.5"
+      let rawRecovery = record.recoveryPercentage || '0';
+      rawRecovery = rawRecovery.replace('%', '').trim();
+      const recoveryPercentage = parseFloat(rawRecovery) || 0;
 
       const scores = calculateDailyScore({ newSalesFoton, newSalesMahindra, resale, recoveryPercentage });
 
