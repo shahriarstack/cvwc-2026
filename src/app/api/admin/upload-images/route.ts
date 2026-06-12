@@ -42,16 +42,26 @@ export async function POST(req: NextRequest) {
     let strikerImageBase64 = undefined;
     let goalkeeperImageBase64 = undefined;
 
-    // Convert file uploads to Base64 strings
+    // Convert file uploads to Base64 strings using standard Edge-compatible Web APIs (btoa)
     if (strikerFile && strikerFile.size > 0) {
       const buffer = await strikerFile.arrayBuffer();
-      const base64Str = Buffer.from(buffer).toString('base64');
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64Str = btoa(binary);
       strikerImageBase64 = `data:${strikerFile.type};base64,${base64Str}`;
     }
 
     if (goalkeeperFile && goalkeeperFile.size > 0) {
       const buffer = await goalkeeperFile.arrayBuffer();
-      const base64Str = Buffer.from(buffer).toString('base64');
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64Str = btoa(binary);
       goalkeeperImageBase64 = `data:${goalkeeperFile.type};base64,${base64Str}`;
     }
 

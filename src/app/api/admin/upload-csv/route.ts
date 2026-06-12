@@ -1,9 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parse } from 'csv-parse/sync';
 import { prisma } from '@/lib/prisma';
 import { calculateDailyScore } from '@/lib/scoring';
 
 export const runtime = 'edge';
+
+// Pure JavaScript CSV parser (100% compatible with Edge environments, zero Node.js dependencies)
+function parseCSV(text: string): Record<string, string>[] {
+  const lines = text.split(/\r?\n/);
+  if (lines.length === 0) return [];
+  
+  let headerIndex = 0;
+  while (headerIndex < lines.length && !lines[headerIndex].trim()) {
+    headerIndex++;
+  }
+  if (headerIndex >= lines.length) return [];
+  
+  const headers = lines[headerIndex].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+  const results: Record<string, string>[] = [];
+  
+  for (let i = headerIndex + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    
+    const values: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let j = 0; j < line.length; j++) {
+      const char = line[j];
+      if (char === '"' || char === "'") {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        values.push(current.trim().replace(/^["']|["']$/g, ''));
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    values.push(current.trim().replace(/^["']|["']$/g, ''));
+    
+    const record: Record<string, string> = {};
+    headers.forEach((header, index) => {
+      record[header] = values[index] || '';
+    });
+    results.push(record);
+  }
+  return results;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,10 +63,7 @@ export async function POST(req: NextRequest) {
     const text = await file.text();
     
     // Expected CSV Headers: territoryName, newSalesFoton, newSalesMahindra, resale, recoveryPercentage
-    const records = parse(text, {
-      columns: true,
-      skip_empty_lines: true
-    }) as any[];
+    const records = parseCSV(text);
 
     const territories = await prisma.territory.findMany();
     const territoryMap = new Map(territories.map(t => [t.name.toLowerCase(), t.id]));

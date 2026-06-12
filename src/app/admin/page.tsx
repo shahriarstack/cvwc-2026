@@ -20,6 +20,28 @@ export default function AdminDashboard() {
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [reseedLoading, setReseedLoading] = useState(false);
+
+  const handleReseed = async () => {
+    if (!confirm('Are you sure you want to reset the database? This will clear all standings, scores, MVPs, and daily logs, and restore the default 44 territories with mock performance history.')) {
+      return;
+    }
+    setReseedLoading(true);
+    try {
+      const res = await fetch('/api/admin/seed', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Database reseeded successfully! Returning to Standing Tables.');
+        window.location.href = '/';
+      } else {
+        alert(`Error seeding database: ${data.error || 'Unknown error'}`);
+      }
+    } catch (e: any) {
+      alert(`Network error: ${e.message || String(e)}`);
+    } finally {
+      setReseedLoading(false);
+    }
+  };
 
   // Spotlight Image & Name Upload State
   const [strikerImage, setStrikerImage] = useState<File | null>(null);
@@ -366,6 +388,43 @@ export default function AdminDashboard() {
           position: 'relative'
         }}
       >
+        <button
+          onClick={handleReseed}
+          disabled={reseedLoading}
+          style={{
+            position: 'absolute',
+            top: '0.5rem',
+            right: '8.5rem',
+            background: 'rgba(217, 119, 6, 0.15)',
+            border: '1px solid rgba(217, 119, 6, 0.3)',
+            color: '#f59e0b',
+            padding: '0.4rem 0.8rem',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: 800,
+            cursor: reseedLoading ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            opacity: reseedLoading ? 0.5 : 1
+          }}
+          onMouseEnter={(e) => {
+            if (!reseedLoading) {
+              e.currentTarget.style.background = 'rgba(217, 119, 6, 0.3)';
+              e.currentTarget.style.borderColor = 'rgba(217, 119, 6, 0.5)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!reseedLoading) {
+              e.currentTarget.style.background = 'rgba(217, 119, 6, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(217, 119, 6, 0.3)';
+            }
+          }}
+        >
+          {reseedLoading ? '🌱 Seeding...' : '🌱 Reset & Seed Database'}
+        </button>
+
         <button
           onClick={handleLogout}
           style={{
