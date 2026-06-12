@@ -95,9 +95,6 @@ a { color: inherit; text-decoration: none; }
   
 }
 
-}
-
-
 
 /* Premium Ultra-Glassmorphism Card */
 .card {
@@ -627,25 +624,59 @@ a { color: inherit; text-decoration: none; }
    MOBILE RESPONSIVENESS (CREATIVE FIT)
    ========================================================================== */
 @media (max-width: 850px) {
-  /* Compact table styling for mobile to ensure all columns fit */
+  /* Ensure the table is incredibly compact yet readable on mobile */
   .fifa-table th, .fifa-table td {
-    padding: 0.25rem 0.35rem;
-    font-size: 0.65rem;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.6rem; /* Slightly smaller for mobile perfectly */
   }
   
   .rank-number {
-    width: 24px;
-    height: 24px;
-    font-size: 0.8rem;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
   }
   
-  /* Make the team name column take slightly less space */
   .team-name {
-    max-width: 80px;
+    max-width: 75px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
+  }
+
+  /* Make Division Tabs scrollable on mobile like native apps */
+  .tournament-tabs {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 0.5rem !important;
+  }
+
+  .tournament-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.75rem;
+  }
+
+  /* Compact Ticker for Mobile */
+  .ticker-wrap {
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  .ticker {
+    line-height: 32px;
+  }
+  .ticker-live-tag {
+    padding: 0 0.5rem;
+    font-size: 0.7rem;
   }
 
   /* Horizontal Swipeable Carousel for Spotlight Cards on Mobile */

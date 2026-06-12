@@ -34,7 +34,7 @@ function LiveNewsTicker() {
   ];
 
   return (
-    <div className="ticker-wrap hidden md:flex">
+    <div className="ticker-wrap flex">
       <div className="ticker-live-tag">LIVE TICKER</div>
       <div className="ticker">
         {tickerItems.map((item, idx) => (
