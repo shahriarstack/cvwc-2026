@@ -29,7 +29,7 @@
   margin: 0;
 }
 
-body {
+html, body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -37,6 +37,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Scrollbar styling */
@@ -677,6 +678,10 @@ a { color: inherit; text-decoration: none; }
   .ticker-live-tag {
     padding: 0 0.5rem;
     font-size: 0.7rem;
+  }
+  /* Hide "TICKER" word on mobile to save space */
+  .ticker-live-tag-text {
+    display: none;
   }
 
   /* Horizontal Swipeable Carousel for Spotlight Cards on Mobile */

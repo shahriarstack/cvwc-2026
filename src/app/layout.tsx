@@ -35,7 +35,7 @@ function LiveNewsTicker() {
 
   return (
     <div className="ticker-wrap flex">
-      <div className="ticker-live-tag">LIVE TICKER</div>
+      <div className="ticker-live-tag">LIVE <span className="ticker-live-tag-text">&nbsp;TICKER</span></div>
       <div className="ticker">
         {tickerItems.map((item, idx) => (
           <span key={idx} className="ticker-item">
@@ -95,23 +95,23 @@ function Navbar() {
             </span>
           </Link>
 
-          {/* Compact Nav Links (Scrollable if needed, fits on mobile) */}
-          <div className="flex items-center" style={{ gap: '0.5rem' }}>
-            <Link href="/" className="font-bold tab-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px' }}>
-              📋 Standings
+          {/* Compact Nav Links (Fits on mobile by hiding text on very small screens) */}
+          <div className="flex items-center" style={{ gap: '0.3rem' }}>
+            <Link href="/" className="font-bold tab-btn" style={{ padding: '0.3rem 0.5rem', fontSize: '0.75rem', borderRadius: '6px' }}>
+              <span style={{ fontSize: '1rem' }}>📋</span> <span className="hidden sm:inline">Standings</span>
             </Link>
-            <Link href="/matches" className="font-bold tab-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px' }}>
-              ⚔️ Fixtures
+            <Link href="/matches" className="font-bold tab-btn" style={{ padding: '0.3rem 0.5rem', fontSize: '0.75rem', borderRadius: '6px' }}>
+              <span style={{ fontSize: '1rem' }}>⚔️</span> <span className="hidden sm:inline">Fixtures</span>
             </Link>
             <Link href="/admin" className="font-bold tab-btn" style={{ 
-              padding: '0.3rem 0.6rem', 
+              padding: '0.3rem 0.5rem', 
               fontSize: '0.75rem', 
               borderRadius: '6px',
               background: 'var(--fifa-burgundy)',
               color: '#fff',
               border: 'none'
             }}>
-              ⚙️ Admin
+              <span style={{ fontSize: '1rem' }}>⚙️</span> <span className="hidden sm:inline">Admin</span>
             </Link>
           </div>
         </div>
