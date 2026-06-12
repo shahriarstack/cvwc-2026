@@ -4,14 +4,25 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 
 let prismaInstance: PrismaClient;
 
+const databaseUrl = process.env.DATABASE_URL;
+
 if (process.env.NODE_ENV === 'production' || typeof (globalThis as any).EdgeRuntime !== 'undefined') {
-  // Configure WebSocket for serverless environments (like Cloudflare Pages/Workers)
-  if (typeof window === 'undefined') {
-    const ws = require('ws');
-    neonConfig.webSocketConstructor = ws;
+  if (!databaseUrl) {
+    console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing!');
+    throw new Error('DATABASE_URL environment variable is missing. Please set it in your Cloudflare Pages dashboard under Settings -> Environment variables.');
+  }
+
+  // Only use the 'ws' library if native WebSocket is not available (e.g. Node.js environment)
+  if (typeof (globalThis as any).WebSocket === 'undefined') {
+    try {
+      const ws = require('ws');
+      neonConfig.webSocketConstructor = ws;
+    } catch (e) {
+      console.error('Failed to load "ws" package:', e);
+    }
   }
   
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({ connectionString: databaseUrl });
   const adapter = new PrismaNeon(pool as any);
   prismaInstance = new PrismaClient({ adapter });
 } else {
@@ -22,3 +33,4 @@ if (process.env.NODE_ENV === 'production' || typeof (globalThis as any).EdgeRunt
 }
 
 export const prisma = prismaInstance;
+
