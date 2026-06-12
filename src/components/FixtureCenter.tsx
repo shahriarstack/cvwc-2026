@@ -215,7 +215,7 @@ export default function FixtureCenter({ initialTerritories }: FixtureCenterProps
                 <div style={{ transform: "scale(1.0)", marginBottom: "0.4rem" }}>
                   <CountryFlag countryName={match.teamA.name} />
                 </div>
-                <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "#fff" }}>
+                <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--text-primary)" }}>
                   {match.teamA.name}
                 </span>
                 <span className="text-secondary" style={{ fontSize: "0.7rem", marginTop: "0.1rem" }}>
@@ -263,7 +263,7 @@ export default function FixtureCenter({ initialTerritories }: FixtureCenterProps
                 <div style={{ transform: "scale(1.0)", marginBottom: "0.4rem" }}>
                   <CountryFlag countryName={match.teamB.name} />
                 </div>
-                <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "#fff" }}>
+                <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--text-primary)" }}>
                   {match.teamB.name}
                 </span>
                 <span className="text-secondary" style={{ fontSize: "0.7rem", marginTop: "0.1rem" }}>

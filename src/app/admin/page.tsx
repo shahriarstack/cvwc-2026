@@ -518,8 +518,8 @@ export default function AdminDashboard() {
         <h1 style={{ 
           fontSize: '2.5rem', 
           fontWeight: 900,
-          color: '#fff',
-          textShadow: '0 0 20px rgba(223, 183, 44, 0.3)',
+          color: 'var(--fifa-burgundy)',
+          textShadow: '0 0 20px rgba(223, 183, 44, 0.2)',
           letterSpacing: '1px',
           textTransform: 'uppercase',
           margin: '0.25rem 0 0 0'
@@ -543,7 +543,7 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-bold" style={{ color: 'var(--fifa-gold)', marginBottom: '1rem' }}>Upload Daily Log (CSV)</h2>
           <form onSubmit={handleUpload} className="flex flex-col" style={{ gap: '1rem' }}>
             <div>
-              <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', display: 'block', marginBottom: '0.5rem' }}>Fixture / Performance Date</label>
+              <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'block', marginBottom: '0.5rem' }}>Fixture / Performance Date</label>
               <input 
                 type="date" 
                 value={date} 
@@ -563,7 +563,7 @@ export default function AdminDashboard() {
               />
             </div>
             <div>
-              <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>CSV Data File</label>
+              <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>CSV Data File</label>
               <div className="flex items-center" style={{ gap: '0.75rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.5rem', position: 'relative', zIndex: 10 }}>
                 <label 
                   htmlFor="csv-upload" 
@@ -642,7 +642,7 @@ export default function AdminDashboard() {
             <form onSubmit={handleImageUpload} className="flex flex-col" style={{ gap: '1rem' }}>
               <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
-                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', display: 'block', marginBottom: '0.5rem' }}>Sales Striker Name</label>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'block', marginBottom: '0.5rem' }}>Sales Striker Name</label>
                   <input 
                     type="text" 
                     placeholder="Enter name"
@@ -661,7 +661,7 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>Sales Striker Photo</label>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>Sales Striker Photo</label>
                   <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
                     {currentStrikerImage && (
                       <div className="flex items-center justify-between" style={{ padding: '0.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.25rem', gap: '0.5rem' }}>
@@ -723,7 +723,7 @@ export default function AdminDashboard() {
  
               <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
-                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', display: 'block', marginBottom: '0.5rem' }}>Recovery Goalkeeper Name</label>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'block', marginBottom: '0.5rem' }}>Recovery Goalkeeper Name</label>
                   <input 
                     type="text" 
                     placeholder="Enter name"
@@ -742,7 +742,7 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>Recovery Goalkeeper Photo</label>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>Recovery Goalkeeper Photo</label>
                   <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
                     {currentGoalkeeperImage && (
                       <div className="flex items-center justify-between" style={{ padding: '0.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.25rem', gap: '0.5rem' }}>
@@ -804,7 +804,7 @@ export default function AdminDashboard() {
 
               <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
-                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', display: 'block', marginBottom: '0.5rem' }}>2nd Recovery Goalkeeper Name (Optional)</label>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'block', marginBottom: '0.5rem' }}>2nd Recovery Goalkeeper Name (Optional)</label>
                   <input 
                     type="text" 
                     placeholder="Enter name"
@@ -823,7 +823,7 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>2nd Goalkeeper Photo</label>
+                  <label className="font-bold" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>2nd Goalkeeper Photo</label>
                   <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
                     {currentGoalkeeper2Image && (
                       <div className="flex items-center justify-between" style={{ padding: '0.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.25rem', gap: '0.5rem' }}>
