@@ -95,13 +95,13 @@ export async function POST(req: NextRequest) {
 
     // Explicitly delete/clear the previous image from the database if a new one is being uploaded
     if (strikerImageBase64 !== undefined && config.strikerImage) {
-      await sql`UPDATE "SpotlightConfig" SET "strikerImage" = NULL WHERE id = 'default'`;
+      await sql`UPDATE "SpotlightConfig" SET "strikerImage" = '' WHERE id = 'default'`;
     }
     if (goalkeeperImageBase64 !== undefined && config.goalkeeperImage) {
-      await sql`UPDATE "SpotlightConfig" SET "goalkeeperImage" = NULL WHERE id = 'default'`;
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeperImage" = '' WHERE id = 'default'`;
     }
     if (goalkeeper2ImageBase64 !== undefined && config.goalkeeper2Image) {
-      await sql`UPDATE "SpotlightConfig" SET "goalkeeper2Image" = NULL WHERE id = 'default'`;
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeper2Image" = '' WHERE id = 'default'`;
     }
 
 
@@ -142,11 +142,11 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (role === 'striker') {
-      await sql`UPDATE "SpotlightConfig" SET "strikerImage" = NULL WHERE id = 'default'`;
+      await sql`UPDATE "SpotlightConfig" SET "strikerImage" = '' WHERE id = 'default'`;
     } else if (role === 'goalkeeper') {
-      await sql`UPDATE "SpotlightConfig" SET "goalkeeperImage" = NULL WHERE id = 'default'`;
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeperImage" = '' WHERE id = 'default'`;
     } else if (role === 'goalkeeper2') {
-      await sql`UPDATE "SpotlightConfig" SET "goalkeeper2Image" = NULL WHERE id = 'default'`;
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeper2Image" = '' WHERE id = 'default'`;
     } else {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
     }
