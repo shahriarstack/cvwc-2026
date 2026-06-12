@@ -92,8 +92,8 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 768px) {
   .grid-cols-2, .grid-cols-4 { grid-template-columns: 1fr; }
-  .container { padding: 0 1rem; }
-  
+  .container { padding: 0 0.5rem; }
+  .card { padding: 0.75rem 0.5rem !important; }
 }
 
 
@@ -625,24 +625,25 @@ a { color: inherit; text-decoration: none; }
    MOBILE RESPONSIVENESS (CREATIVE FIT)
    ========================================================================== */
 @media (max-width: 850px) {
-  /* Ensure the table is incredibly compact yet readable on mobile */
+  /* Ensure the table natively auto-fits the screen width by zooming out robustly */
+  .fifa-table-container {
+    zoom: 0.68;
+  }
+  
+  /* Reset previous compact hacks since zoom perfectly scales everything */
   .fifa-table th, .fifa-table td {
-    padding: 0.35rem 0.25rem;
-    font-size: 0.6rem; /* Slightly smaller for mobile perfectly */
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
   }
   
   .rank-number {
-    width: 22px;
-    height: 22px;
-    font-size: 0.75rem;
+    width: 26px;
+    height: 26px;
+    font-size: 0.85rem;
   }
   
   .team-name {
-    max-width: 75px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
   }
 
   /* Make Division Tabs scrollable on mobile like native apps */
