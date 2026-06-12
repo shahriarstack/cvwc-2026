@@ -294,7 +294,7 @@ export default function Dashboard({ initialTerritories, spotlightOverrides }: Da
             </p>
           </div>
 
-          <div className="flex justify-center items-center flex-wrap perspective-1000" style={{ gap: "1.5rem" }}>
+          <div className="spotlight-carousel flex justify-center items-center flex-wrap perspective-1000" style={{ gap: "1.5rem" }}>
             {topTeamMembers.map((member, mIdx) => (
               <div key={mIdx} className="text-center" style={{ perspective: '1000px' }}>
                 <div style={{ 

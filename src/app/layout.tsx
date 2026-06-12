@@ -56,9 +56,8 @@ function LiveNewsTicker() {
 function Navbar() {
   return (
     <>
-      {/* Top Navbar - Minimal Branding */}
       <nav className="top-navbar" style={{ 
-        background: 'rgba(255, 255, 255, 0.85)', 
+        background: 'rgba(255, 255, 255, 0.95)', 
         borderBottom: '1px solid rgba(223, 183, 44, 0.25)',
         boxShadow: '0 4px 20px rgba(124, 18, 36, 0.04)',
         backdropFilter: 'blur(12px)',
@@ -67,88 +66,56 @@ function Navbar() {
         top: 0,
         zIndex: 90
       }}>
-        <div className="container flex items-center justify-center py-2">
-          {/* Sleek logo badge integration */}
-          <Link href="/" className="flex items-center" style={{ gap: '0.5rem' }}>
+        <div className="container flex items-center justify-between py-2 md:py-3">
+          {/* Logo */}
+          <Link href="/" className="flex items-center" style={{ gap: '0.4rem' }}>
             <div style={{
               background: 'var(--fifa-burgundy)',
-              padding: '0.3rem 0.75rem',
-              borderRadius: '6px',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '4px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               border: '1px solid rgba(223, 183, 44, 0.3)',
-              boxShadow: '0 2px 8px rgba(124, 18, 36, 0.1)'
             }}>
               <img 
                 src="https://i.ibb.co.com/N2kYDkbt/ACI-Motors-Logo-AI-White.png" 
                 alt="ACI Motors" 
-                style={{ height: '18px', objectFit: 'contain' }}
+                style={{ height: '14px', objectFit: 'contain' }}
               />
             </div>
             <span style={{ 
-              fontSize: '1.25rem', 
+              fontSize: '1.1rem', 
               fontWeight: 900, 
               color: 'var(--fifa-burgundy)', 
               letterSpacing: '0.5px',
               textTransform: 'uppercase'
             }}>
-              CVWC 2026
+              CVWC '26
             </span>
           </Link>
+
+          {/* Compact Nav Links (Scrollable if needed, fits on mobile) */}
+          <div className="flex items-center" style={{ gap: '0.5rem' }}>
+            <Link href="/" className="font-bold tab-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px' }}>
+              📋 Standings
+            </Link>
+            <Link href="/matches" className="font-bold tab-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px' }}>
+              ⚔️ Fixtures
+            </Link>
+            <Link href="/admin" className="font-bold tab-btn" style={{ 
+              padding: '0.3rem 0.6rem', 
+              fontSize: '0.75rem', 
+              borderRadius: '6px',
+              background: 'var(--fifa-burgundy)',
+              color: '#fff',
+              border: 'none'
+            }}>
+              ⚙️ Admin
+            </Link>
+          </div>
         </div>
       </nav>
-
-      {/* Universal App-like Bottom Navigation Dock (Desktop & Mobile) */}
-      <div className="universal-bottom-nav" style={{
-        position: 'fixed',
-        bottom: '15px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'calc(100% - 30px)',
-        maxWidth: '500px',
-        height: '65px',
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(15px)',
-        WebkitBackdropFilter: 'blur(15px)',
-        border: '1px solid rgba(0,0,0,0.08)',
-        borderRadius: '35px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
-        display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        zIndex: 100,
-        padding: '0 10px'
-      }}>
-        <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem' }}>
-          <span style={{ fontSize: '1.25rem' }}>📋</span>
-          <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}>Standings</span>
-        </Link>
-        
-        <Link href="/matches" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem', position: 'relative' }}>
-          <div style={{
-            position: 'absolute',
-            top: '-25px',
-            background: 'linear-gradient(135deg, var(--fifa-burgundy-light) 0%, var(--fifa-burgundy) 100%)',
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 15px rgba(124, 18, 36, 0.4)',
-            border: '3px solid #fff'
-          }}>
-            <span style={{ fontSize: '1.4rem' }}>⚔️</span>
-          </div>
-          <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '22px' }}>Fixtures</span>
-        </Link>
-        
-        <Link href="/admin" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem' }}>
-          <span style={{ fontSize: '1.25rem' }}>⚙️</span>
-          <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}>Admin</span>
-        </Link>
-      </div>
     </>
   );
 }
