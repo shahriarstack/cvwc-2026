@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import html2canvas from "html2canvas";
+import { getTerritoryTeam } from "@/lib/mvps";
 
 export default function ScorecardGenerator() {
   const [loading, setLoading] = useState(false);
@@ -12,9 +13,17 @@ export default function ScorecardGenerator() {
     setLoading(true);
     try {
       // 1. Fetch data
-      const res = await fetch("/api/leaderboard");
-      if (!res.ok) throw new Error("Failed to fetch data");
+      const [res, spotlightRes] = await Promise.all([
+        fetch("/api/leaderboard"),
+        fetch("/api/admin/upload-images")
+      ]);
+      if (!res.ok) throw new Error("Failed to fetch leaderboard data");
       const { territories } = await res.json();
+
+      let spotlightData = { strikerName: '', goalkeeperName: '', strikerImage: '', goalkeeperImage: '', goalkeeper2Name: '', goalkeeper2Image: '' };
+      if (spotlightRes.ok) {
+        spotlightData = await spotlightRes.json();
+      }
 
       // 2. Process data exactly like Dashboard
       const data = territories.map((t: any) => {
@@ -63,7 +72,10 @@ export default function ScorecardGenerator() {
         return { ...team, division, rank: index + 1 };
       });
 
-      setScorecardData(dividedLeaderboard);
+      setScorecardData({
+        leaderboard: dividedLeaderboard,
+        spotlight: spotlightData
+      });
 
       // Wait a moment for React to render the DOM
       setTimeout(async () => {
@@ -151,31 +163,158 @@ export default function ScorecardGenerator() {
               </p>
             </div>
 
-            {/* Top Performing Team Highlight */}
-            <div style={{ 
-              background: 'linear-gradient(135deg, rgba(223, 183, 44, 0.15) 0%, rgba(124, 18, 36, 0.15) 100%)',
-              border: '1px solid rgba(223, 183, 44, 0.4)',
-              borderRadius: '16px',
-              padding: '25px',
-              textAlign: 'center',
-              marginBottom: '40px',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
-            }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--fifa-gold)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Overall Current Leader
-              </span>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 900, margin: '5px 0', color: '#fff' }}>
-                {scorecardData[0].name}
-              </h2>
-              <div style={{ display: 'inline-block', background: 'var(--fifa-burgundy)', padding: '5px 15px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 800 }}>
-                {scorecardData[0].totalScore.toFixed(1)} PTS
-              </div>
-            </div>
+            {/* Top Highlight Section */}
+            {(() => {
+              const topTeam = scorecardData.leaderboard[0];
+              const members = [...getTerritoryTeam(topTeam.name)];
+              
+              // If the admin provided a second goalkeeper, inject them dynamically
+              const hasGK2 = scorecardData.spotlight.goalkeeper2Name || scorecardData.spotlight.goalkeeper2Image;
+              if (hasGK2) {
+                members.push({
+                  name: scorecardData.spotlight.goalkeeper2Name || "Recovery Officer",
+                  role: "Recovery Goalkeeper",
+                  avatarCode: "recovery"
+                });
+              }
+
+              let goalkeepersProcessed = 0;
+              const performers = members.map((m) => {
+                let imageSrc = "";
+                let playerName = m.name;
+
+                if (m.avatarCode === "sales") {
+                  if (scorecardData.spotlight.strikerImage) {
+                    imageSrc = scorecardData.spotlight.strikerImage;
+                  }
+                  if (scorecardData.spotlight.strikerName) {
+                    playerName = scorecardData.spotlight.strikerName;
+                  }
+                } else if (m.avatarCode === "recovery") {
+                  goalkeepersProcessed++;
+                  if (goalkeepersProcessed === 1) {
+                    if (scorecardData.spotlight.goalkeeperImage) {
+                      imageSrc = scorecardData.spotlight.goalkeeperImage;
+                    }
+                    if (scorecardData.spotlight.goalkeeperName) {
+                      playerName = scorecardData.spotlight.goalkeeperName;
+                    }
+                  } else {
+                    if (scorecardData.spotlight.goalkeeper2Image) {
+                      imageSrc = scorecardData.spotlight.goalkeeper2Image;
+                    }
+                    if (scorecardData.spotlight.goalkeeper2Name) {
+                      playerName = scorecardData.spotlight.goalkeeper2Name;
+                    }
+                  }
+                }
+
+                return {
+                  name: playerName,
+                  role: m.role,
+                  image: imageSrc,
+                  avatarCode: m.avatarCode
+                };
+              });
+
+              return (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '420px 1fr',
+                  gap: '30px',
+                  marginBottom: '40px'
+                }}>
+                  {/* Overall Current Top Team */}
+                  <div style={{ 
+                    background: 'linear-gradient(135deg, rgba(124, 18, 36, 0.2) 0%, rgba(223, 183, 44, 0.2) 100%)',
+                    border: '2px solid var(--fifa-gold)',
+                    borderRadius: '16px',
+                    padding: '25px',
+                    textAlign: 'center',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--fifa-gold)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                      Overall Current Top Team
+                    </span>
+                    <h2 style={{ fontSize: '2.5rem', fontWeight: 900, margin: '10px 0', color: '#fff', textTransform: 'uppercase' }}>
+                      {topTeam.name}
+                    </h2>
+                    <div style={{ display: 'inline-block', background: 'var(--fifa-burgundy)', padding: '6px 20px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 800 }}>
+                      {topTeam.totalScore.toFixed(1)} PTS
+                    </div>
+                  </div>
+
+                  {/* Spotlight Performers */}
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '16px',
+                    padding: '20px 25px',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <h3 style={{ 
+                      fontSize: '1rem', 
+                      fontWeight: 800, 
+                      color: 'var(--fifa-gold)', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '1.5px',
+                      margin: '0 0 15px 0',
+                      textAlign: 'center',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                      paddingBottom: '8px'
+                    }}>
+                      ⭐ Top Team Spotlight Performers ⭐
+                    </h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', gap: '15px' }}>
+                      {performers.map((perf, pIdx) => (
+                        <div key={pIdx} style={{ textAlign: 'center', flex: 1 }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            border: '2px solid var(--fifa-gold)',
+                            background: 'radial-gradient(circle, rgba(223, 183, 44, 0.2) 0%, transparent 80%)',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                            overflow: 'hidden',
+                            margin: '0 auto 8px auto',
+                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {perf.image ? (
+                              <img src={perf.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <svg style={{ width: '40px', height: '40px', color: 'rgba(250,204,21,0.5)' }} viewBox="0 0 100 100" fill="currentColor">
+                                <path d="M50 15c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15zm-22.5 45c-4.1 0-7.5 3.4-7.5 7.5v12.5c0 2.8 2.2 5 5 5h50c2.8 0 5-2.2 5-5V67.5c0-4.1-3.4-7.5-7.5-7.5H27.5z" />
+                              </svg>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: '0 auto' }}>
+                            {perf.name}
+                          </div>
+                          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--fifa-gold)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>
+                            {perf.role === 'Sales Striker' ? 'Sales Striker' : perf.role === 'Recovery Goalkeeper' ? 'Recovery GK' : 'Tactical MF'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Division Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
               {["Elite", "Champions", "Warriors", "Challengers"].map(division => {
-                const teams = scorecardData.filter((t: any) => t.division === division);
+                const teams = scorecardData.leaderboard.filter((t: any) => t.division === division);
                 const colors: any = {
                   "Elite": "#facc15",
                   "Champions": "#94a3b8",
