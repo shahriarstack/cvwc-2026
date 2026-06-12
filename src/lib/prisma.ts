@@ -7,12 +7,14 @@ let prismaInstance: PrismaClient | undefined;
 function getPrisma() {
   if (prismaInstance) return prismaInstance;
 
-  const databaseUrl = process.env.DATABASE_URL;
+  // Next.js statically inlines process.env.DATABASE_URL during build time.
+  // To load it dynamically at runtime in Cloudflare, we must use bracket notation.
+  const databaseUrl = process.env['DATABASE_URL'] || process.env.DATABASE_URL;
 
   if (process.env.NODE_ENV === 'production' || typeof (globalThis as any).EdgeRuntime !== 'undefined') {
-    if (!databaseUrl) {
-      console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing!');
-      throw new Error('DATABASE_URL environment variable is missing. Please set it in your Cloudflare Pages dashboard under Settings -> Environment variables.');
+    if (!databaseUrl || databaseUrl === 'undefined' || databaseUrl === 'null') {
+      console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing or evaluated as undefined/null!');
+      throw new Error('DATABASE_URL environment variable is missing or evaluated as "undefined" / "null". Please set it in your Cloudflare Pages dashboard under Settings -> Environment variables, click SAVE, and push the code again.');
     }
 
     // Cloudflare natively supports WebSocket, so we do not need to import or configure 'ws'.
