@@ -56,7 +56,7 @@ function LiveNewsTicker() {
 function Navbar() {
   return (
     <>
-      {/* Top Navbar - Used for branding on mobile, and full nav on desktop */}
+      {/* Top Navbar - Minimal Branding */}
       <nav className="top-navbar" style={{ 
         background: 'rgba(255, 255, 255, 0.85)', 
         borderBottom: '1px solid rgba(223, 183, 44, 0.25)',
@@ -67,7 +67,7 @@ function Navbar() {
         top: 0,
         zIndex: 90
       }}>
-        <div className="container flex items-center justify-center md:justify-between py-2 md:py-3">
+        <div className="container flex items-center justify-center py-2">
           {/* Sleek logo badge integration */}
           <Link href="/" className="flex items-center" style={{ gap: '0.5rem' }}>
             <div style={{
@@ -96,39 +96,29 @@ function Navbar() {
               CVWC 2026
             </span>
           </Link>
-
-          {/* Desktop Nav Links (Hidden on mobile) */}
-          <div className="hidden md:flex items-center" style={{ gap: '1.25rem' }}>
-            <Link href="/" className="font-bold tab-btn nav-link">
-              📋 Standings
-            </Link>
-            <Link href="/matches" className="font-bold tab-btn nav-link">
-              ⚔️ Fixtures
-            </Link>
-            <Link href="/admin" className="font-bold tab-btn nav-link">
-              ⚙️ Admin
-            </Link>
-          </div>
         </div>
       </nav>
 
-      {/* App-like Bottom Navigation Bar (Visible only on mobile) */}
-      <div className="mobile-bottom-nav md:hidden" style={{
+      {/* Universal App-like Bottom Navigation Dock (Desktop & Mobile) */}
+      <div className="universal-bottom-nav" style={{
         position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        bottom: '15px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'calc(100% - 30px)',
+        maxWidth: '500px',
         height: '65px',
         background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(15px)',
         WebkitBackdropFilter: 'blur(15px)',
-        borderTop: '1px solid rgba(0,0,0,0.08)',
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
+        border: '1px solid rgba(0,0,0,0.08)',
+        borderRadius: '35px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
         zIndex: 100,
-        paddingBottom: 'env(safe-area-inset-bottom)' // Safe area for iOS
+        padding: '0 10px'
       }}>
         <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem' }}>
           <span style={{ fontSize: '1.25rem' }}>📋</span>
@@ -138,18 +128,18 @@ function Navbar() {
         <Link href="/matches" className="flex flex-col items-center justify-center w-full h-full text-secondary hover:text-accent transition-colors" style={{ gap: '0.2rem', position: 'relative' }}>
           <div style={{
             position: 'absolute',
-            top: '-20px',
+            top: '-25px',
             background: 'linear-gradient(135deg, var(--fifa-burgundy-light) 0%, var(--fifa-burgundy) 100%)',
-            width: '50px',
-            height: '50px',
+            width: '56px',
+            height: '56px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 4px 15px rgba(124, 18, 36, 0.4)',
-            border: '2px solid #fff'
+            border: '3px solid #fff'
           }}>
-            <span style={{ fontSize: '1.3rem' }}>⚔️</span>
+            <span style={{ fontSize: '1.4rem' }}>⚔️</span>
           </div>
           <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '22px' }}>Fixtures</span>
         </Link>
