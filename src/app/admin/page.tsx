@@ -140,6 +140,54 @@ export default function AdminDashboard() {
     }
   };
 
+  const resizeImage = (file: File, maxWidth = 600, maxHeight = 600): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+          }
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const resizedFile = new File([blob], file.name, {
+                type: file.type || 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              resolve(resizedFile);
+            } else {
+              resolve(file);
+            }
+          }, file.type || 'image/jpeg', 0.85); // 85% quality compression
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!strikerImage && !goalkeeperImage && !goalkeeper2Image && !strikerNameInput.trim() && !goalkeeperNameInput.trim() && !goalkeeper2NameInput.trim()) {
@@ -150,15 +198,24 @@ export default function AdminDashboard() {
     setImageUploadLoading(true);
     setImageUploadMessage('');
 
-    const formData = new FormData();
-    if (strikerImage) formData.append('striker', strikerImage);
-    if (goalkeeperImage) formData.append('goalkeeper', goalkeeperImage);
-    if (goalkeeper2Image) formData.append('goalkeeper2', goalkeeper2Image);
-    formData.append('strikerName', strikerNameInput);
-    formData.append('goalkeeperName', goalkeeperNameInput);
-    formData.append('goalkeeper2Name', goalkeeper2NameInput);
-
     try {
+      const formData = new FormData();
+      if (strikerImage) {
+        const compressed = await resizeImage(strikerImage);
+        formData.append('striker', compressed);
+      }
+      if (goalkeeperImage) {
+        const compressed = await resizeImage(goalkeeperImage);
+        formData.append('goalkeeper', compressed);
+      }
+      if (goalkeeper2Image) {
+        const compressed = await resizeImage(goalkeeper2Image);
+        formData.append('goalkeeper2', compressed);
+      }
+      formData.append('strikerName', strikerNameInput);
+      formData.append('goalkeeperName', goalkeeperNameInput);
+      formData.append('goalkeeper2Name', goalkeeper2NameInput);
+
       const res = await fetch('/api/admin/upload-images', {
         method: 'POST',
         body: formData,
@@ -193,6 +250,7 @@ export default function AdminDashboard() {
       setImageUploadLoading(false);
     }
   };
+
 
   const handleDeleteImage = async (role: 'striker' | 'goalkeeper' | 'goalkeeper2') => {
     if (!confirm(`Are you sure you want to delete the current ${role} photo?`)) {
