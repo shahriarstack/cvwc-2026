@@ -1,4 +1,4 @@
-import { prisma, resolvedDatabaseUrl } from "@/lib/prisma";
+import { sql, resolvedDatabaseUrl } from "@/lib/db";
 import FixtureCenter from "@/components/FixtureCenter";
 
 function maskConnectionString(url: string): string {
@@ -24,11 +24,22 @@ export default async function MatchesPage() {
 
   try {
     // Query all territories and historical sales data for match simulations
-    rawTerritories = await prisma.territory.findMany({
-      include: {
-        performances: true
+    const territories = await sql`SELECT * FROM "Territory"`;
+    const performances = await sql`SELECT * FROM "DailyPerformance"`;
+
+    // Group performances by territoryId
+    const perfMap = new Map<string, any[]>();
+    for (const p of performances) {
+      if (!perfMap.has(p.territoryId)) {
+        perfMap.set(p.territoryId, []);
       }
-    });
+      perfMap.get(p.territoryId)!.push(p);
+    }
+
+    rawTerritories = territories.map(t => ({
+      ...t,
+      performances: perfMap.get(t.id) || []
+    }));
   } catch (error: any) {
     console.error("Critical Database Fetch Error (Matches):", error);
     dbError = error?.message || String(error);
@@ -88,7 +99,7 @@ export default async function MatchesPage() {
                 <strong>Non-Pooled Neon String:</strong> Ensure the connection string uses the Neon pooler endpoint (with <code>-pooler</code> in the hostname).
               </li>
               <li>
-                <strong>Prisma Client Out of Sync:</strong> Rebuild or push schema via your local command line.
+                <strong>Compatibility Flags:</strong> Ensure the <code>nodejs_compat</code> compatibility flag is enabled under your Cloudflare Pages project Settings.
               </li>
             </ul>
           </div>
@@ -191,7 +202,7 @@ export default async function MatchesPage() {
     ...t,
     performances: t.performances.map((p: any) => ({
       ...p,
-      date: p.date.toISOString()
+      date: new Date(p.date).toISOString()
     }))
   }));
 

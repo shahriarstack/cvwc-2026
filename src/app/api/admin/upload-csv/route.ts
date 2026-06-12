@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { sql } from '@/lib/db';
 import { calculateDailyScore } from '@/lib/scoring';
 
 export const runtime = 'edge';
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     
     const records = parseCSV(text);
 
-    const territories = await prisma.territory.findMany();
+    const territories = await sql`SELECT * FROM "Territory"`;
     const territoryMap = new Map(territories.map(t => [normalizeName(t.name), t.id]));
 
     let processed = 0;
@@ -112,29 +112,28 @@ export async function POST(req: NextRequest) {
       const recoveryPercentage = parseFloat(rawRecovery) || 0;
 
       const scores = calculateDailyScore({ newSalesFoton, newSalesMahindra, resale, recoveryPercentage });
+      
+      const perfId = crypto.randomUUID();
+      const dateIso = date.toISOString();
 
-      await prisma.dailyPerformance.upsert({
-        where: {
-          date_territoryId: {
-            date,
-            territoryId
-          }
-        },
-        update: {
-          newSalesFoton,
-          newSalesMahindra,
-          resale,
-          ...scores
-        },
-        create: {
-          date,
-          territoryId,
-          newSalesFoton,
-          newSalesMahindra,
-          resale,
-          ...scores
-        }
-      });
+      await sql`
+        INSERT INTO "DailyPerformance" (
+          "id", "date", "territoryId", "newSalesFoton", "newSalesMahindra", "resale", 
+          "salesPerformanceScore", "recoveryPerformanceScore", "mahindraBonusScore", "totalDailyScore"
+        ) VALUES (
+          ${perfId}, ${dateIso}, ${territoryId}, ${newSalesFoton}, ${newSalesMahindra}, ${resale}, 
+          ${scores.salesPerformanceScore}, ${scores.recoveryPerformanceScore}, ${scores.mahindraBonusScore}, ${scores.totalDailyScore}
+        )
+        ON CONFLICT ("date", "territoryId") 
+        DO UPDATE SET 
+          "newSalesFoton" = EXCLUDED."newSalesFoton",
+          "newSalesMahindra" = EXCLUDED."newSalesMahindra",
+          "resale" = EXCLUDED."resale",
+          "salesPerformanceScore" = EXCLUDED."salesPerformanceScore",
+          "recoveryPerformanceScore" = EXCLUDED."recoveryPerformanceScore",
+          "mahindraBonusScore" = EXCLUDED."mahindraBonusScore",
+          "totalDailyScore" = EXCLUDED."totalDailyScore"
+      `;
       processed++;
     }
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { sql } from '@/lib/db';
 
 export const runtime = 'edge';
 
@@ -17,24 +17,20 @@ export async function POST(req: Request) {
     console.log('Seeding database via Edge API...');
 
     // 1. Clear existing database
-    await prisma.dailyPerformance.deleteMany();
-    await prisma.match.deleteMany();
-    await prisma.playerMVP.deleteMany();
-    await prisma.territory.deleteMany();
+    await sql`TRUNCATE TABLE "DailyPerformance", "Match", "PlayerMVP", "Territory" CASCADE`;
 
     // 2. Insert territories
     const divisions = ["Elite", "Champions", "Warriors", "Challengers"];
     for (let i = 0; i < territories.length; i++) {
       const divisionIndex = Math.floor(i / 11);
-      await prisma.territory.create({
-        data: {
-          name: territories[i],
-          division: divisions[divisionIndex] || "Challengers",
-        }
-      });
+      const id = crypto.randomUUID();
+      await sql`
+        INSERT INTO "Territory" ("id", "name", "division") 
+        VALUES (${id}, ${territories[i]}, ${divisions[divisionIndex] || "Challengers"})
+      `;
     }
 
-    const allTerritories = await prisma.territory.findMany();
+    const allTerritories = await sql`SELECT * FROM "Territory"`;
 
     // 3. Generate 5 days of random performance data
     const today = new Date();
@@ -42,6 +38,7 @@ export async function POST(req: Request) {
       const date = new Date(today);
       date.setDate(date.getDate() - d);
       date.setHours(0, 0, 0, 0);
+      const dateIso = date.toISOString();
       
       for (const terr of allTerritories) {
         const newSalesFoton = Math.floor(Math.random() * 10);
@@ -56,19 +53,16 @@ export async function POST(req: Request) {
         const salesPerformanceScore = newSalesScore + resaleScore;
         const totalDailyScore = salesPerformanceScore + recoveryScore + mahindraBonus;
 
-        await prisma.dailyPerformance.create({
-          data: {
-            date,
-            territoryId: terr.id,
-            newSalesFoton,
-            newSalesMahindra,
-            resale,
-            salesPerformanceScore,
-            recoveryPerformanceScore: recoveryScore,
-            mahindraBonusScore: mahindraBonus,
-            totalDailyScore
-          }
-        });
+        const perfId = crypto.randomUUID();
+        await sql`
+          INSERT INTO "DailyPerformance" (
+            "id", "date", "territoryId", "newSalesFoton", "newSalesMahindra", "resale", 
+            "salesPerformanceScore", "recoveryPerformanceScore", "mahindraBonusScore", "totalDailyScore"
+          ) VALUES (
+            ${perfId}, ${dateIso}, ${terr.id}, ${newSalesFoton}, ${newSalesMahindra}, ${resale}, 
+            ${salesPerformanceScore}, ${recoveryScore}, ${mahindraBonus}, ${totalDailyScore}
+          )
+        `;
       }
     }
 

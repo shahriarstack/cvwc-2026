@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { sql } from '@/lib/db';
 
 export const runtime = 'edge';
 
 export async function GET() {
   try {
-    let config = await prisma.spotlightConfig.findUnique({
-      where: { id: 'default' }
-    });
+    const configs = await sql`SELECT * FROM "SpotlightConfig" WHERE id = 'default' LIMIT 1`;
+    let config = configs[0];
     
     if (!config) {
       config = {
@@ -65,25 +64,30 @@ export async function POST(req: NextRequest) {
       goalkeeperImageBase64 = `data:${goalkeeperFile.type};base64,${base64Str}`;
     }
 
-    const updateData: any = {};
-    if (strikerName !== null) updateData.strikerName = strikerName.trim();
-    if (goalkeeperName !== null) updateData.goalkeeperName = goalkeeperName.trim();
-    if (strikerImageBase64 !== undefined) updateData.strikerImage = strikerImageBase64;
-    if (goalkeeperImageBase64 !== undefined) updateData.goalkeeperImage = goalkeeperImageBase64;
-
-    const createData = {
+    const configs = await sql`SELECT * FROM "SpotlightConfig" WHERE id = 'default' LIMIT 1`;
+    const config = configs[0] || {
       id: 'default',
-      strikerName: strikerName?.trim() || '',
-      goalkeeperName: goalkeeperName?.trim() || '',
-      strikerImage: strikerImageBase64 || '',
-      goalkeeperImage: goalkeeperImageBase64 || ''
+      strikerName: '',
+      goalkeeperName: '',
+      strikerImage: '',
+      goalkeeperImage: ''
     };
 
-    await prisma.spotlightConfig.upsert({
-      where: { id: 'default' },
-      update: updateData,
-      create: createData
-    });
+    const finalStrikerName = strikerName !== null ? strikerName.trim() : config.strikerName;
+    const finalGoalkeeperName = goalkeeperName !== null ? goalkeeperName.trim() : config.goalkeeperName;
+    const finalStrikerImage = strikerImageBase64 !== undefined ? strikerImageBase64 : config.strikerImage;
+    const finalGoalkeeperImage = goalkeeperImageBase64 !== undefined ? goalkeeperImageBase64 : config.goalkeeperImage;
+
+    await sql`
+      INSERT INTO "SpotlightConfig" ("id", "strikerName", "goalkeeperName", "strikerImage", "goalkeeperImage")
+      VALUES ('default', ${finalStrikerName}, ${finalGoalkeeperName}, ${finalStrikerImage}, ${finalGoalkeeperImage})
+      ON CONFLICT ("id")
+      DO UPDATE SET
+        "strikerName" = EXCLUDED."strikerName",
+        "goalkeeperName" = EXCLUDED."goalkeeperName",
+        "strikerImage" = EXCLUDED."strikerImage",
+        "goalkeeperImage" = EXCLUDED."goalkeeperImage"
+    `;
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

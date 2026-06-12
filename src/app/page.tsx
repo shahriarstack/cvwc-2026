@@ -1,4 +1,4 @@
-import { prisma, resolvedDatabaseUrl } from "@/lib/prisma";
+import { sql, resolvedDatabaseUrl } from "@/lib/db";
 import Dashboard from "@/components/Dashboard";
 
 function maskConnectionString(url: string): string {
@@ -26,17 +26,27 @@ export default async function Home() {
 
   try {
     // Fetch all territories and their historical performances
-    rawTerritories = await prisma.territory.findMany({
-      include: {
-        performances: true
+    const territories = await sql`SELECT * FROM "Territory"`;
+    const performances = await sql`SELECT * FROM "DailyPerformance"`;
+
+    // Group performances by territoryId
+    const perfMap = new Map<string, any[]>();
+    for (const p of performances) {
+      if (!perfMap.has(p.territoryId)) {
+        perfMap.set(p.territoryId, []);
       }
-    });
+      perfMap.get(p.territoryId)!.push(p);
+    }
+
+    rawTerritories = territories.map(t => ({
+      ...t,
+      performances: perfMap.get(t.id) || []
+    }));
 
     // Read spotlight customizations from database instead of static files
     try {
-      const config = await prisma.spotlightConfig.findUnique({
-        where: { id: 'default' }
-      });
+      const configs = await sql`SELECT * FROM "SpotlightConfig" WHERE id = 'default' LIMIT 1`;
+      const config = configs[0];
       if (config) {
         spotlightOverrides.strikerName = config.strikerName || '';
         spotlightOverrides.goalkeeperName = config.goalkeeperName || '';
@@ -237,7 +247,7 @@ export default async function Home() {
     ...t,
     performances: t.performances.map((p: any) => ({
       ...p,
-      date: p.date.toISOString()
+      date: new Date(p.date).toISOString()
     }))
   }));
 
