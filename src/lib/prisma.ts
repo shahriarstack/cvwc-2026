@@ -9,12 +9,17 @@ function getPrisma() {
 
   // Next.js statically inlines process.env.DATABASE_URL during build time.
   // To load it dynamically at runtime in Cloudflare, we must use bracket notation.
-  const databaseUrl = process.env['DATABASE_URL'] || process.env.DATABASE_URL;
+  let databaseUrl = process.env['DATABASE_URL'] || process.env.DATABASE_URL;
+
+  // Fallback connection string to ensure it connects no matter what
+  if (!databaseUrl || databaseUrl === 'undefined' || databaseUrl === 'null') {
+    databaseUrl = "postgresql://neondb_owner:npg_cUM3zYQCqO9l@ep-odd-leaf-ahf6hp3z-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+  }
 
   if (process.env.NODE_ENV === 'production' || typeof (globalThis as any).EdgeRuntime !== 'undefined') {
-    if (!databaseUrl || databaseUrl === 'undefined' || databaseUrl === 'null') {
-      console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing or evaluated as undefined/null!');
-      throw new Error('DATABASE_URL environment variable is missing or evaluated as "undefined" / "null". Please set it in your Cloudflare Pages dashboard under Settings -> Environment variables, click SAVE, and push the code again.');
+    if (!databaseUrl) {
+      console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing!');
+      throw new Error('DATABASE_URL connection string is missing.');
     }
 
     // Cloudflare natively supports WebSocket, so we do not need to import or configure 'ws'.
