@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
+export let resolvedDatabaseUrl = "";
+
 let prismaInstance: PrismaClient | undefined;
 
 function getPrisma() {
@@ -15,6 +17,8 @@ function getPrisma() {
   if (!databaseUrl || databaseUrl === 'undefined' || databaseUrl === 'null') {
     databaseUrl = "postgresql://neondb_owner:npg_cUM3zYQCqO9l@ep-odd-leaf-ahf6hp3z-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
   }
+
+  resolvedDatabaseUrl = databaseUrl;
 
   if (process.env.NODE_ENV === 'production' || typeof (globalThis as any).EdgeRuntime !== 'undefined') {
     if (!databaseUrl) {

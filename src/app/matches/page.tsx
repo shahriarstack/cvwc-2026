@@ -1,5 +1,18 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, resolvedDatabaseUrl } from "@/lib/prisma";
 import FixtureCenter from "@/components/FixtureCenter";
+
+function maskConnectionString(url: string): string {
+  if (!url) return "[Empty]";
+  try {
+    const parsed = new URL(url);
+    if (parsed.password) {
+      parsed.password = "********";
+    }
+    return parsed.toString();
+  } catch (e) {
+    return url.replace(/(postgresql:\/\/.*:)(.*)(@.*)/, "$1********$3");
+  }
+}
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
@@ -60,6 +73,9 @@ export default async function MatchesPage() {
           }}>
             <strong>Error Message:</strong><br />
             {dbError}
+            <hr style={{ margin: '0.75rem 0', borderColor: 'rgba(239, 68, 68, 0.2)' }} />
+            <strong>Resolved Connection String:</strong><br />
+            {maskConnectionString(resolvedDatabaseUrl)}
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
