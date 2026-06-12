@@ -131,3 +131,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const role = searchParams.get('role');
+
+    if (!role) {
+      return NextResponse.json({ error: 'Role query parameter is required' }, { status: 400 });
+    }
+
+    if (role === 'striker') {
+      await sql`UPDATE "SpotlightConfig" SET "strikerImage" = NULL WHERE id = 'default'`;
+    } else if (role === 'goalkeeper') {
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeperImage" = NULL WHERE id = 'default'`;
+    } else if (role === 'goalkeeper2') {
+      await sql`UPDATE "SpotlightConfig" SET "goalkeeper2Image" = NULL WHERE id = 'default'`;
+    } else {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Error deleting image from database:', error);
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  }
+}
+

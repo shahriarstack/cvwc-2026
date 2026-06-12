@@ -52,6 +52,9 @@ export default function AdminDashboard() {
   const [strikerNameInput, setStrikerNameInput] = useState('');
   const [goalkeeperNameInput, setGoalkeeperNameInput] = useState('');
   const [goalkeeper2NameInput, setGoalkeeper2NameInput] = useState('');
+  const [currentStrikerImage, setCurrentStrikerImage] = useState<string | null>(null);
+  const [currentGoalkeeperImage, setCurrentGoalkeeperImage] = useState<string | null>(null);
+  const [currentGoalkeeper2Image, setCurrentGoalkeeper2Image] = useState<string | null>(null);
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -76,6 +79,9 @@ export default function AdminDashboard() {
           setStrikerNameInput(data.strikerName || '');
           setGoalkeeperNameInput(data.goalkeeperName || '');
           setGoalkeeper2NameInput(data.goalkeeper2Name || '');
+          setCurrentStrikerImage(data.strikerImage || null);
+          setCurrentGoalkeeperImage(data.goalkeeperImage || null);
+          setCurrentGoalkeeper2Image(data.goalkeeper2Image || null);
         }
       } catch (e) {}
     };
@@ -169,6 +175,15 @@ export default function AdminDashboard() {
         if (strikerInput) strikerInput.value = '';
         if (gkInput) gkInput.value = '';
         if (gk2Input) gk2Input.value = '';
+        
+        // Re-fetch to update image thumbnails
+        const refetchRes = await fetch('/api/admin/upload-images');
+        if (refetchRes.ok) {
+          const refetchData = await refetchRes.json();
+          setCurrentStrikerImage(refetchData.strikerImage || null);
+          setCurrentGoalkeeperImage(refetchData.goalkeeperImage || null);
+          setCurrentGoalkeeper2Image(refetchData.goalkeeper2Image || null);
+        }
       } else {
         setImageUploadMessage(`Error: ${data.error}`);
       }
@@ -178,6 +193,30 @@ export default function AdminDashboard() {
       setImageUploadLoading(false);
     }
   };
+
+  const handleDeleteImage = async (role: 'striker' | 'goalkeeper' | 'goalkeeper2') => {
+    if (!confirm(`Are you sure you want to delete the current ${role} photo?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/upload-images?role=${role}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        if (role === 'striker') setCurrentStrikerImage(null);
+        if (role === 'goalkeeper') setCurrentGoalkeeperImage(null);
+        if (role === 'goalkeeper2') setCurrentGoalkeeper2Image(null);
+        setImageUploadMessage(`Success: ${role} photo deleted from database.`);
+      } else {
+        const data = await res.json();
+        setImageUploadMessage(`Error: ${data.error || 'Failed to delete photo'}`);
+      }
+    } catch (err) {
+      setImageUploadMessage('Error: Failed to send delete request');
+    }
+  };
+
 
   const downloadTemplate = () => {
     const headers = "territoryName,newSalesFoton,newSalesMahindra,resale,recoveryPercentage\n";
@@ -624,6 +663,30 @@ export default function AdminDashboard() {
                 <div>
                   <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>Sales Striker Photo</label>
                   <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
+                    {currentStrikerImage && (
+                      <div className="flex items-center justify-between" style={{ padding: '0.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.25rem', gap: '0.5rem' }}>
+                        <div className="flex items-center" style={{ gap: '0.5rem' }}>
+                          <img src={currentStrikerImage} alt="Current Striker" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--fifa-gold)' }} />
+                          <span style={{ fontSize: '0.7rem', color: '#a7f3d0', fontWeight: 600 }}>Active Image</span>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => handleDeleteImage('striker')} 
+                          style={{
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.5rem',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    )}
                     <label 
                       htmlFor="striker-file-input" 
                       className="btn"
@@ -681,6 +744,30 @@ export default function AdminDashboard() {
                 <div>
                   <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>Recovery Goalkeeper Photo</label>
                   <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
+                    {currentGoalkeeperImage && (
+                      <div className="flex items-center justify-between" style={{ padding: '0.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.25rem', gap: '0.5rem' }}>
+                        <div className="flex items-center" style={{ gap: '0.5rem' }}>
+                          <img src={currentGoalkeeperImage} alt="Current Goalkeeper" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--fifa-gold)' }} />
+                          <span style={{ fontSize: '0.7rem', color: '#a7f3d0', fontWeight: 600 }}>Active Image</span>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => handleDeleteImage('goalkeeper')} 
+                          style={{
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.5rem',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    )}
                     <label 
                       htmlFor="gk-file-input" 
                       className="btn"
@@ -738,6 +825,30 @@ export default function AdminDashboard() {
                 <div>
                   <label className="font-bold" style={{ fontSize: '0.85rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>2nd Goalkeeper Photo</label>
                   <div className="flex flex-col animate-fade-in" style={{ gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', position: 'relative', zIndex: 10 }}>
+                    {currentGoalkeeper2Image && (
+                      <div className="flex items-center justify-between" style={{ padding: '0.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.25rem', gap: '0.5rem' }}>
+                        <div className="flex items-center" style={{ gap: '0.5rem' }}>
+                          <img src={currentGoalkeeper2Image} alt="Current Goalkeeper 2" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--fifa-gold)' }} />
+                          <span style={{ fontSize: '0.7rem', color: '#a7f3d0', fontWeight: 600 }}>Active Image</span>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => handleDeleteImage('goalkeeper2')} 
+                          style={{
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.5rem',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    )}
                     <label 
                       htmlFor="gk2-file-input" 
                       className="btn"
