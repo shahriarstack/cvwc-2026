@@ -18,6 +18,11 @@ function getPrisma() {
     databaseUrl = "postgresql://neondb_owner:npg_cUM3zYQCqO9l@ep-odd-leaf-ahf6hp3z-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
   }
 
+  // Dynamically assign process.env.DATABASE_URL so that all third-party dependencies 
+  // (Prisma, Neon serverless, etc.) can read it at runtime.
+  process.env.DATABASE_URL = databaseUrl;
+  process.env['DATABASE_URL'] = databaseUrl;
+
   resolvedDatabaseUrl = databaseUrl;
 
   if (process.env.NODE_ENV === 'production' || typeof (globalThis as any).EdgeRuntime !== 'undefined') {
