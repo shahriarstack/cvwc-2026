@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import html2canvas from "html2canvas";
 import { getTerritoryTeam } from "@/lib/mvps";
+import CountryFlag from "./CountryFlag";
 
 export default function ScorecardGenerator() {
   const [loading, setLoading] = useState(false);
@@ -311,91 +312,92 @@ export default function ScorecardGenerator() {
               );
             })()}
 
-              {/* Division Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                {["Elite", "Champions", "Warriors", "Challengers"].map(division => {
-                  const teams = scorecardData.leaderboard.filter((t: any) => t.division === division);
-                  const colors: any = {
-                    "Elite": "#facc15",
-                    "Champions": "#cbd5e1",
-                    "Warriors": "#f59e0b",
-                    "Challengers": "#38bdf8"
-                  };
-                  
-                  return (
-                    <div key={division} style={{ 
-                      background: 'rgba(15, 23, 42, 0.6)', 
-                      border: '1px solid rgba(255,255,255,0.08)', 
-                      borderRadius: '16px',
-                      padding: '25px',
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                      backdropFilter: 'blur(10px)'
+            {/* Division Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+              {["Elite", "Champions", "Warriors", "Challengers"].map(division => {
+                const teams = scorecardData.leaderboard.filter((t: any) => t.division === division);
+                const colors: any = {
+                  "Elite": "#facc15",
+                  "Champions": "#94a3b8",
+                  "Warriors": "#d97706",
+                  "Challengers": "#0ea5e9"
+                };
+                
+                return (
+                  <div key={division} style={{ 
+                    background: 'rgba(255,255,255,0.02)', 
+                    border: '1px solid rgba(255,255,255,0.05)', 
+                    borderRadius: '12px',
+                    padding: '20px'
+                  }}>
+                    <h3 style={{ 
+                      fontSize: '1.5rem', 
+                      margin: '0 0 15px 0', 
+                      color: colors[division], 
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      borderBottom: `2px solid ${colors[division]}`,
+                      paddingBottom: '10px'
                     }}>
-                      <h3 style={{ 
-                        fontSize: '1.6rem', 
-                        margin: '0 0 20px 0', 
-                        color: colors[division], 
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        borderBottom: `2px solid ${colors[division]}`,
-                        paddingBottom: '12px',
-                        letterSpacing: '1px'
-                      }}>
-                        {division} Division
-                      </h3>
-                      
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
-                        <thead>
-                          <tr style={{ color: '#94a3b8', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <th style={{ padding: '10px 6px', width: '45px', fontWeight: 700 }}>RK</th>
-                            <th style={{ padding: '10px 6px', fontWeight: 700 }}>Territory</th>
-                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Sales</th>
-                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Resale</th>
-                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Bonus</th>
-                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Recov</th>
-                            <th style={{ padding: '10px 6px', textAlign: 'right', color: '#fff', fontWeight: 800 }}>TOTAL</th>
+                      {division} Division
+                    </h3>
+                    
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                      <thead>
+                        <tr style={{ color: '#64748b', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                          <th style={{ padding: '8px 4px', width: '40px' }}>RK</th>
+                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Territory</th>
+                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Sales</th>
+                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Resale</th>
+                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Bonus</th>
+                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Recov</th>
+                          <th style={{ padding: '8px 4px', textAlign: 'right', color: '#fff' }}>TOTAL</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {teams.map((team: any) => (
+                          <tr key={team.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#94a3b8' }}>#{team.rank}</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 600, color: '#fff' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                                <CountryFlag countryName={team.name} />
+                                <span style={{ fontSize: '0.75rem', textAlign: 'center', lineHeight: '1.1', maxWidth: '80px', wordWrap: 'break-word' }}>{team.name}</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 4px', textAlign: 'center' }}>
+                              <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span style={{ color: '#fff', fontWeight: 700 }}>{team.newSalesScore.toFixed(0)} <span style={{fontSize:'0.6rem', color:'#64748b', fontWeight:500}}>pt</span></span>
+                                <span style={{ fontSize: '0.65rem', color: '#38bdf8', fontWeight: 700, background: 'rgba(56,189,248,0.1)', padding: '1px 4px', borderRadius: '4px', marginTop: '2px' }}>{team.fotonUnits + team.mahindraUnits} U</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 4px', textAlign: 'center' }}>
+                              <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span style={{ color: '#fff', fontWeight: 700 }}>{team.resaleScore.toFixed(0)} <span style={{fontSize:'0.6rem', color:'#64748b', fontWeight:500}}>pt</span></span>
+                                <span style={{ fontSize: '0.65rem', color: '#a855f7', fontWeight: 700, background: 'rgba(168,85,247,0.1)', padding: '1px 4px', borderRadius: '4px', marginTop: '2px' }}>{team.resaleUnits} U</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 4px', textAlign: 'center' }}>
+                              <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span style={{ color: '#fff', fontWeight: 700 }}>{team.mahindraBonus.toFixed(0)} <span style={{fontSize:'0.6rem', color:'#64748b', fontWeight:500}}>pt</span></span>
+                                <span style={{ fontSize: '0.65rem', color: '#facc15', fontWeight: 700, background: 'rgba(250,204,21,0.1)', padding: '1px 4px', borderRadius: '4px', marginTop: '2px' }}>{team.mahindraUnits} M</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 4px', textAlign: 'center' }}>
+                              <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span style={{ color: '#fff', fontWeight: 700 }}>{team.recoveryScore.toFixed(1)} <span style={{fontSize:'0.6rem', color:'#64748b', fontWeight:500}}>pt</span></span>
+                                <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 700, background: 'rgba(16,185,129,0.1)', padding: '1px 4px', borderRadius: '4px', marginTop: '2px' }}>{team.avgRecoveryPercentage.toFixed(0)}%</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 4px', textAlign: 'right', fontWeight: 800, color: colors[division], fontSize: '1.05rem' }}>
+                              {team.totalScore.toFixed(1)}
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {teams.map((team: any) => (
-                            <tr key={team.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                              <td style={{ padding: '10px 6px', fontWeight: 700, color: '#94a3b8' }}>#{team.rank}</td>
-                              <td style={{ padding: '10px 6px', fontWeight: 600, color: '#fff' }}>{team.name}</td>
-                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.newSalesScore.toFixed(0)}</span>
-                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.fotonUnits + team.mahindraUnits} units</span>
-                                </div>
-                              </td>
-                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.resaleScore.toFixed(0)}</span>
-                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.resaleUnits} units</span>
-                                </div>
-                              </td>
-                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.mahindraBonus.toFixed(0)}</span>
-                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.mahindraUnits}u Mah</span>
-                                </div>
-                              </td>
-                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.recoveryScore.toFixed(1)}</span>
-                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.avgRecoveryPercentage.toFixed(0)}%</span>
-                                </div>
-                              </td>
-                              <td style={{ padding: '10px 6px', textAlign: 'right', fontWeight: 800, color: colors[division], fontSize: '1.1rem' }}>
-                                {team.totalScore.toFixed(1)}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  );
-                })}
-              </div>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
             </div>
             
             <div style={{ textAlign: 'center', marginTop: '30px', color: '#475569', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '1px' }}>
