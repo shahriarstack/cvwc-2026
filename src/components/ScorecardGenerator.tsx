@@ -148,27 +148,17 @@ export default function ScorecardGenerator() {
             style={{
               width: '1200px', // Fixed poster width
               background: 'linear-gradient(180deg, #0f172a 0%, #050a12 100%)',
-              padding: '40px',
               color: '#fff',
-              fontFamily: 'system-ui, -apple-system, sans-serif'
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              position: 'relative',
+              overflow: 'hidden'
             }}
           >
-            {/* Header Section */}
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h1 style={{ fontSize: '3rem', fontWeight: 900, margin: 0, color: 'var(--fifa-gold)', textTransform: 'uppercase' }}>
-                CV World Cup 2026
-              </h1>
-              <p style={{ fontSize: '1.2rem', color: '#94a3b8', margin: '10px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                Official Global Standings • {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-            </div>
-
-            {/* Top Highlight Section */}
+            {/* Background Watermark Section */}
             {(() => {
               const topTeam = scorecardData.leaderboard[0];
               const members = [...getTerritoryTeam(topTeam.name)];
               
-              // If the admin provided a second goalkeeper, inject them dynamically
               const hasGK2 = scorecardData.spotlight.goalkeeper2Name || scorecardData.spotlight.goalkeeper2Image;
               if (hasGK2) {
                 members.push({
@@ -182,196 +172,201 @@ export default function ScorecardGenerator() {
               const performers = members.map((m) => {
                 let imageSrc = "";
                 let playerName = m.name;
-
+                
                 if (m.avatarCode === "sales") {
-                  if (scorecardData.spotlight.strikerImage) {
-                    imageSrc = scorecardData.spotlight.strikerImage;
-                  }
-                  if (scorecardData.spotlight.strikerName) {
-                    playerName = scorecardData.spotlight.strikerName;
-                  }
+                  if (scorecardData.spotlight.strikerImage) imageSrc = scorecardData.spotlight.strikerImage;
+                  if (scorecardData.spotlight.strikerName) playerName = scorecardData.spotlight.strikerName;
                 } else if (m.avatarCode === "recovery") {
                   goalkeepersProcessed++;
                   if (goalkeepersProcessed === 1) {
-                    if (scorecardData.spotlight.goalkeeperImage) {
-                      imageSrc = scorecardData.spotlight.goalkeeperImage;
-                    }
-                    if (scorecardData.spotlight.goalkeeperName) {
-                      playerName = scorecardData.spotlight.goalkeeperName;
-                    }
+                    if (scorecardData.spotlight.goalkeeperImage) imageSrc = scorecardData.spotlight.goalkeeperImage;
+                    if (scorecardData.spotlight.goalkeeperName) playerName = scorecardData.spotlight.goalkeeperName;
                   } else {
-                    if (scorecardData.spotlight.goalkeeper2Image) {
-                      imageSrc = scorecardData.spotlight.goalkeeper2Image;
-                    }
-                    if (scorecardData.spotlight.goalkeeper2Name) {
-                      playerName = scorecardData.spotlight.goalkeeper2Name;
-                    }
+                    if (scorecardData.spotlight.goalkeeper2Image) imageSrc = scorecardData.spotlight.goalkeeper2Image;
+                    if (scorecardData.spotlight.goalkeeper2Name) playerName = scorecardData.spotlight.goalkeeper2Name;
                   }
                 }
+                return { ...m, name: playerName, imageSrc };
+              }).filter(p => p.imageSrc);
 
-                return {
-                  name: playerName,
-                  role: m.role,
-                  image: imageSrc,
-                  avatarCode: m.avatarCode
-                };
-              });
+              if (performers.length === 0) return null;
 
               return (
                 <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '420px 1fr',
-                  gap: '30px',
-                  marginBottom: '40px'
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  zIndex: 0,
+                  display: 'flex',
+                  opacity: 0.15, // Subtle watermark effect
+                  mixBlendMode: 'luminosity'
                 }}>
-                  {/* Overall Current Top Team */}
-                  <div style={{ 
-                    background: 'linear-gradient(135deg, rgba(124, 18, 36, 0.2) 0%, rgba(223, 183, 44, 0.2) 100%)',
-                    border: '2px solid var(--fifa-gold)',
-                    borderRadius: '16px',
-                    padding: '25px',
-                    textAlign: 'center',
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--fifa-gold)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      Overall Current Top Team
-                    </span>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: 900, margin: '10px 0', color: '#fff', textTransform: 'uppercase' }}>
-                      {topTeam.name}
-                    </h2>
-                    <div style={{ display: 'inline-block', background: 'var(--fifa-burgundy)', padding: '6px 20px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 800 }}>
-                      {topTeam.totalScore.toFixed(1)} PTS
+                  {performers.map((perf, idx) => (
+                    <div key={idx} style={{ flex: 1, position: 'relative', height: '100%' }}>
+                       <img src={perf.imageSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
+                       {/* Fade out gradient at the bottom so it blends with the dark background */}
+                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, rgba(15,23,42,0) 0%, rgba(15,23,42,0.5) 50%, #050a12 100%)' }}></div>
+                       {/* Subtle name label integrated into the watermark */}
+                       <div style={{ 
+                         position: 'absolute', 
+                         bottom: '15%', 
+                         left: '50%', 
+                         transform: 'translateX(-50%)', 
+                         fontSize: '3rem', 
+                         fontWeight: 900, 
+                         textTransform: 'uppercase', 
+                         color: '#fff', 
+                         whiteSpace: 'nowrap', 
+                         opacity: 0.2,
+                         letterSpacing: '5px'
+                       }}>
+                         {perf.name}
+                       </div>
                     </div>
-                  </div>
-
-                  {/* Spotlight Performers */}
-                  <div style={{
-                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '16px',
-                    padding: '20px 25px',
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center'
-                  }}>
-                    <h3 style={{ 
-                      fontSize: '1rem', 
-                      fontWeight: 800, 
-                      color: 'var(--fifa-gold)', 
-                      textTransform: 'uppercase', 
-                      letterSpacing: '1.5px',
-                      margin: '0 0 15px 0',
-                      textAlign: 'center',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      paddingBottom: '8px'
-                    }}>
-                      ⭐ Top Team Spotlight Performers ⭐
-                    </h3>
-                    <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', gap: '15px' }}>
-                      {performers.map((perf, pIdx) => (
-                        <div key={pIdx} style={{ textAlign: 'center', flex: 1 }}>
-                          <div style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            border: '2px solid var(--fifa-gold)',
-                            background: 'radial-gradient(circle, rgba(223, 183, 44, 0.2) 0%, transparent 80%)',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
-                            overflow: 'hidden',
-                            margin: '0 auto 8px auto',
-                            position: 'relative',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            {perf.image ? (
-                              <img src={perf.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              <svg style={{ width: '40px', height: '40px', color: 'rgba(250,204,21,0.5)' }} viewBox="0 0 100 100" fill="currentColor">
-                                <path d="M50 15c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15zm-22.5 45c-4.1 0-7.5 3.4-7.5 7.5v12.5c0 2.8 2.2 5 5 5h50c2.8 0 5-2.2 5-5V67.5c0-4.1-3.4-7.5-7.5-7.5H27.5z" />
-                              </svg>
-                            )}
-                          </div>
-                          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: '0 auto' }}>
-                            {perf.name}
-                          </div>
-                          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--fifa-gold)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>
-                            {perf.role === 'Sales Striker' ? 'Sales Striker' : perf.role === 'Recovery Goalkeeper' ? 'Recovery GK' : 'Tactical MF'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               );
             })()}
 
-            {/* Division Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-              {["Elite", "Champions", "Warriors", "Challengers"].map(division => {
-                const teams = scorecardData.leaderboard.filter((t: any) => t.division === division);
-                const colors: any = {
-                  "Elite": "#facc15",
-                  "Champions": "#94a3b8",
-                  "Warriors": "#d97706",
-                  "Challengers": "#0ea5e9"
-                };
-                
+            {/* Foreground Content */}
+            <div style={{ position: 'relative', zIndex: 10, padding: '50px' }}>
+              {/* Header Section */}
+              <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+                <h1 style={{ fontSize: '3.5rem', fontWeight: 900, margin: 0, color: 'var(--fifa-gold)', textTransform: 'uppercase', textShadow: '0 4px 20px rgba(223, 183, 44, 0.4)' }}>
+                  CV World Cup 2026
+                </h1>
+                <p style={{ fontSize: '1.2rem', color: '#e2e8f0', margin: '10px 0 0 0', textTransform: 'uppercase', letterSpacing: '4px', fontWeight: 600 }}>
+                  Official Global Standings • {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              </div>
+
+              {/* Top Highlight Section */}
+              {(() => {
+                const topTeam = scorecardData.leaderboard[0];
                 return (
-                  <div key={division} style={{ 
-                    background: 'rgba(255,255,255,0.02)', 
-                    border: '1px solid rgba(255,255,255,0.05)', 
-                    borderRadius: '12px',
-                    padding: '20px'
+                  <div style={{ 
+                    maxWidth: '700px',
+                    margin: '0 auto 60px auto',
+                    background: 'linear-gradient(135deg, rgba(124, 18, 36, 0.3) 0%, rgba(223, 183, 44, 0.15) 100%)',
+                    border: '1px solid rgba(223, 183, 44, 0.4)',
+                    borderRadius: '24px',
+                    padding: '35px',
+                    textAlign: 'center',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                    backdropFilter: 'blur(12px)'
                   }}>
-                    <h3 style={{ 
-                      fontSize: '1.5rem', 
-                      margin: '0 0 15px 0', 
-                      color: colors[division], 
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      borderBottom: `2px solid ${colors[division]}`,
-                      paddingBottom: '10px'
-                    }}>
-                      {division} Division
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', marginBottom: '15px' }}>
+                      <span style={{ height: '2px', width: '50px', background: 'var(--fifa-gold)', opacity: 0.6 }}></span>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--fifa-gold)', textTransform: 'uppercase', letterSpacing: '3px' }}>
+                        Overall Current Top Team
+                      </span>
+                      <span style={{ height: '2px', width: '50px', background: 'var(--fifa-gold)', opacity: 0.6 }}></span>
+                    </div>
                     
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                      <thead>
-                        <tr style={{ color: '#64748b', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                          <th style={{ padding: '8px 4px', width: '40px' }}>RK</th>
-                          <th style={{ padding: '8px 4px' }}>Territory</th>
-                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Sales</th>
-                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Resale</th>
-                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Bonus</th>
-                          <th style={{ padding: '8px 4px', textAlign: 'center' }}>Recov</th>
-                          <th style={{ padding: '8px 4px', textAlign: 'right', color: '#fff' }}>TOTAL</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {teams.map((team: any) => (
-                          <tr key={team.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#94a3b8' }}>#{team.rank}</td>
-                            <td style={{ padding: '8px 4px', fontWeight: 600, color: '#fff' }}>{team.name}</td>
-                            <td style={{ padding: '8px 4px', textAlign: 'center', color: '#94a3b8' }}>{team.newSalesScore.toFixed(0)}</td>
-                            <td style={{ padding: '8px 4px', textAlign: 'center', color: '#94a3b8' }}>{team.resaleScore.toFixed(0)}</td>
-                            <td style={{ padding: '8px 4px', textAlign: 'center', color: '#94a3b8' }}>{team.mahindraBonus.toFixed(0)}</td>
-                            <td style={{ padding: '8px 4px', textAlign: 'center', color: '#94a3b8' }}>{team.recoveryScore.toFixed(1)}</td>
-                            <td style={{ padding: '8px 4px', textAlign: 'right', fontWeight: 800, color: colors[division] }}>
-                              {team.totalScore.toFixed(1)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <h2 style={{ fontSize: '4rem', fontWeight: 900, margin: '20px 0', color: '#fff', textTransform: 'uppercase', textShadow: '0 4px 20px rgba(0,0,0,0.8)', letterSpacing: '1px' }}>
+                      {topTeam.name}
+                    </h2>
+                    
+                    <div style={{ 
+                      display: 'inline-block', 
+                      background: 'linear-gradient(90deg, var(--fifa-burgundy), #a3162f)', 
+                      padding: '12px 40px', 
+                      borderRadius: '40px', 
+                      fontSize: '1.8rem', 
+                      fontWeight: 900,
+                      boxShadow: '0 8px 25px rgba(124, 18, 36, 0.4)',
+                      border: '1px solid rgba(255,255,255,0.15)'
+                    }}>
+                      {topTeam.totalScore.toFixed(1)} PTS
+                    </div>
                   </div>
                 );
-              })}
+              })()}
+
+              {/* Division Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                {["Elite", "Champions", "Warriors", "Challengers"].map(division => {
+                  const teams = scorecardData.leaderboard.filter((t: any) => t.division === division);
+                  const colors: any = {
+                    "Elite": "#facc15",
+                    "Champions": "#cbd5e1",
+                    "Warriors": "#f59e0b",
+                    "Challengers": "#38bdf8"
+                  };
+                  
+                  return (
+                    <div key={division} style={{ 
+                      background: 'rgba(15, 23, 42, 0.6)', 
+                      border: '1px solid rgba(255,255,255,0.08)', 
+                      borderRadius: '16px',
+                      padding: '25px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <h3 style={{ 
+                        fontSize: '1.6rem', 
+                        margin: '0 0 20px 0', 
+                        color: colors[division], 
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        borderBottom: `2px solid ${colors[division]}`,
+                        paddingBottom: '12px',
+                        letterSpacing: '1px'
+                      }}>
+                        {division} Division
+                      </h3>
+                      
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                        <thead>
+                          <tr style={{ color: '#94a3b8', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <th style={{ padding: '10px 6px', width: '45px', fontWeight: 700 }}>RK</th>
+                            <th style={{ padding: '10px 6px', fontWeight: 700 }}>Territory</th>
+                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Sales</th>
+                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Resale</th>
+                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Bonus</th>
+                            <th style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 700 }}>Recov</th>
+                            <th style={{ padding: '10px 6px', textAlign: 'right', color: '#fff', fontWeight: 800 }}>TOTAL</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {teams.map((team: any) => (
+                            <tr key={team.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                              <td style={{ padding: '10px 6px', fontWeight: 700, color: '#94a3b8' }}>#{team.rank}</td>
+                              <td style={{ padding: '10px 6px', fontWeight: 600, color: '#fff' }}>{team.name}</td>
+                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.newSalesScore.toFixed(0)}</span>
+                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.fotonUnits + team.mahindraUnits} units</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.resaleScore.toFixed(0)}</span>
+                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.resaleUnits} units</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.mahindraBonus.toFixed(0)}</span>
+                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.mahindraUnits}u Mah</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 6px', textAlign: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{team.recoveryScore.toFixed(1)}</span>
+                                  <span style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{team.avgRecoveryPercentage.toFixed(0)}%</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 6px', textAlign: 'right', fontWeight: 800, color: colors[division], fontSize: '1.1rem' }}>
+                                {team.totalScore.toFixed(1)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             
             <div style={{ textAlign: 'center', marginTop: '30px', color: '#475569', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '1px' }}>
