@@ -29,8 +29,22 @@
   margin: 0;
 }
 
+@keyframes futuristic-mesh {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 html, body {
-  background-color: var(--bg-color);
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(223, 183, 44, 0.2) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(124, 18, 36, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(56, 189, 248, 0.15) 0px, transparent 50%);
+  background-size: 200% 200%;
+  animation: futuristic-mesh 15s ease infinite;
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
